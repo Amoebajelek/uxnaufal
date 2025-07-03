@@ -10,7 +10,7 @@ const interTight = Inter_Tight({
 });
 
 export const metadata: Metadata = {
-  title: "uxnaufal | Professional UI/UX Designer",
+  title: "uxnaufal",
   description: "Professional UI/UX Designer",
 };
 
