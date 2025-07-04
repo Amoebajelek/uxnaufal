@@ -22,6 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <meta http-equiv='refresh' content='0; URL=https://naufalabdussyakur.notion.site/1865d9ae1b9c80a49da5f2858485a6cb'></meta>
       <body className={interTight.className}>
         <ThemeProvider
           attribute="class"
