@@ -1,11 +1,35 @@
 import { ModeToggle } from "@/components/mode-toggle";
+import { MdOutlineArrowDownward } from "react-icons/md";
 
 export default function Home() {
   return (
-      <div className="flex">
-        <div className="flex justify-center items-center w-full min-h-screen">
-          <ModeToggle />
+    <div className="flex flex-col">
+      <div className="flex px-16 py-8 min-w-full bg-white shadow absolute">
+        <h1 className="text-xl font-bold text-black">uxnaufal</h1>
+      </div>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
+        <div className="flex gap-8">
+          <h1 className="text-9xl font-bold text-black mb-4">HI! I'M NAUFAL</h1>
+          <p className="text-xl text-gray-500 w-96 mt-6">
+            I’ve been in the design industy since +3 years. I craft digital
+            product that are useful & enjoyable for the final users.
+          </p>
+        </div>
+        <h1 className="text-9xl font-bold text-black mb-4">UI/UX DESIGNER</h1>
+        <div className="flex flex-col gap-4 items-center">
+          <p className="text-xl text-black w-96 text-center mt-24">
+            SEE MY WORKS
+          </p>
+          <MdOutlineArrowDownward size={24} className="text-gray-500" />
         </div>
       </div>
+      <div className="flex gap-4 justify-center items-center">
+        <div className="w-32 h-32"></div>
+        <p className="text-xl text-gray-500 w-96 mt-6">
+          I’ve been in the design industy since +3 years. I craft digital
+          product that are useful & enjoyable for the final users.
+        </p>
+      </div>
+    </div>
   );
 }
