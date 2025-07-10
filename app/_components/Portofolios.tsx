@@ -146,7 +146,7 @@ export default function Portofolios() {
               by UX laws and supported with full design and handoff
               documentation.
             </p>
-            <a href="https://naufalabdussyakur.notion.site/Bale-Seni-Barli-Redesign-official-website-1865d9ae1b9c800c8dccf8b0c5e86be2?pvs=25">
+            <a href="https://naufalabdussyakur.notion.site/Amal-Academy-E-Course-Website-1865d9ae1b9c80bf9fdbdefc464811a1?pvs=25">
               <div className="flex justify-center items-center px-6 py-4 w-full lg:w-fit gap-2 lg:gap-4 bg-black hover:bg-gray-900 dark:bg-white dark:hover:bg-gray-200 cursor-pointer rounded-full">
                 <p className="text-lg text-white dark:text-black font-medium">
                   View
