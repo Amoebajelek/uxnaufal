@@ -4,10 +4,10 @@ import { MdOutlineArrowRightAlt } from "react-icons/md";
 
 export default function Portofolios() {
   return (
-    <div className="flex flex-col justify-center items-center">
-      <div className="flex gap-6 justify-center items-center w-8/12">
-        <div className="w-1/2 h-[400px] bg-black rounded-4xl"></div>
-        <div className="flex flex-col w-1/2">
+    <div className="flex flex-col justify-center items-center mt-12 lg:mt-0">
+      <div className="flex flex-col lg:flex-row gap-6 justify-center items-center w-10/12 lg:w-8/12">
+        <div className="w-full lg:w-1/2 h-[400px] bg-black rounded-4xl"></div>
+        <div className="flex flex-col w-full lg:w-1/2">
           <div className="flex flex-col gap-2">
             <p className="text-base text-gray-500 font-medium">
               Personal Project
@@ -21,7 +21,7 @@ export default function Portofolios() {
               A complete website redesign for aitiserve.co.id, guided by UX laws
               and supported with full design and handoff documentation.
             </p>
-            <div className="flex items-center px-6 py-4 w-fit gap-2 bg-black rounded-full">
+            <div className="flex justify-center items-center px-6 py-4 w-full lg:w-fit gap-2 lg:gap-6 bg-black rounded-full">
               <p className="text-lg text-white font-medium">View</p>
               <MdOutlineArrowRightAlt size={24} className="text-white" />
             </div>
