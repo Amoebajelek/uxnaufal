@@ -1,0 +1,36 @@
+import React from "react";
+
+import { MdOutlineArrowRightAlt } from "react-icons/md";
+
+export default function Contacts() {
+  return (
+    <div className="flex justify-center items-center mt-12">
+      <div className="flex w-8/12">
+        <h1 className="text-2xl font-bold text-black w-1/3">@uxnaufal</h1>
+        <div className="flex flex-col gap-8 w-2/3">
+          <div className="flex border-b-2 w-full justify-between items-center">
+            <div className="flex flex-col">
+              <h1 className="text-xl font-semibold text-black">Instagram</h1>
+              <p className="text-lg text-gray-500">500K+ followers</p>
+            </div>
+            <MdOutlineArrowRightAlt size={24} className="text-black" />
+          </div>
+          <div className="flex border-b-2 w-full justify-between items-center">
+            <div className="flex flex-col">
+              <h1 className="text-xl font-semibold text-black">Threads</h1>
+              <p className="text-lg text-gray-500">400K+ followers</p>
+            </div>
+            <MdOutlineArrowRightAlt size={24} className="text-black" />
+          </div>
+          <div className="flex border-b-2 w-full justify-between items-center">
+            <div className="flex flex-col">
+              <h1 className="text-xl font-semibold text-black">TikTok</h1>
+              <p className="text-lg text-gray-500">300K+ followes</p>
+            </div>
+            <MdOutlineArrowRightAlt size={24} className="text-black" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
