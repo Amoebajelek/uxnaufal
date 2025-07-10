@@ -32,7 +32,11 @@ export default function Portofolios() {
               A complete website redesign for Papyrusphoto, guided by UX laws
               and supported with full design and handoff documentation.
             </p>
-            <a href="https://naufalabdussyakur.notion.site/PAPYRUS-PHOTO-Tablet-Application-1865d9ae1b9c808887a3e91b34d9031a?pvs=25">
+            <a
+              href="https://naufalabdussyakur.notion.site/PAPYRUS-PHOTO-Tablet-Application-1865d9ae1b9c808887a3e91b34d9031a?pvs=25"
+              className="cursor-pointer"
+              target="_blank"
+            >
               <div className="flex justify-center items-center px-6 py-4 w-full lg:w-fit gap-2 lg:gap-4 bg-black hover:bg-gray-900 dark:bg-white dark:hover:bg-gray-200 cursor-pointer rounded-full">
                 <p className="text-lg text-white dark:text-black font-medium">
                   View
@@ -70,7 +74,11 @@ export default function Portofolios() {
               by UX laws and supported with full design and handoff
               documentation.
             </p>
-            <a href="https://naufalabdussyakur.notion.site/CMS-Product-Catalog-Telkom-Product-Catalog-Website-1865d9ae1b9c8003a98fc129586a3b86?pvs=25">
+            <a
+              href="https://naufalabdussyakur.notion.site/CMS-Product-Catalog-Telkom-Product-Catalog-Website-1865d9ae1b9c8003a98fc129586a3b86?pvs=25"
+              className="cursor-pointer"
+              target="_blank"
+            >
               <div className="flex justify-center items-center px-6 py-4 w-full lg:w-fit gap-2 lg:gap-4 bg-black hover:bg-gray-900 dark:bg-white dark:hover:bg-gray-200 cursor-pointer rounded-full">
                 <p className="text-lg text-white dark:text-black font-medium">
                   View
@@ -108,7 +116,11 @@ export default function Portofolios() {
               by UX laws and supported with full design and handoff
               documentation.
             </p>
-            <a href="https://naufalabdussyakur.notion.site/Bale-Seni-Barli-Redesign-official-website-1865d9ae1b9c800c8dccf8b0c5e86be2?pvs=25">
+            <a
+              href="https://naufalabdussyakur.notion.site/Bale-Seni-Barli-Redesign-official-website-1865d9ae1b9c800c8dccf8b0c5e86be2?pvs=25"
+              className="cursor-pointer"
+              target="_blank"
+            >
               <div className="flex justify-center items-center px-6 py-4 w-full lg:w-fit gap-2 lg:gap-4 bg-black hover:bg-gray-900 dark:bg-white dark:hover:bg-gray-200 cursor-pointer rounded-full">
                 <p className="text-lg text-white dark:text-black font-medium">
                   View
@@ -122,7 +134,7 @@ export default function Portofolios() {
           </div>
         </div>
       </div>
-      
+
       {/* Portofolio #4 - Amal Academy by Amal Solution */}
       <div className="flex flex-col lg:flex-row gap-6 justify-center items-center w-10/12 lg:w-8/12">
         <div className="w-full lg:max-w-1/2 max-h-[400px] bg-black dark:bg-gray-100 rounded-3xl lg:rounded-4xl overflow-hidden border border-solid border-gray-100 shadow-sm">
@@ -142,11 +154,14 @@ export default function Portofolios() {
           </div>
           <div className="flex flex-col gap-4">
             <p className="text-lg text-gray-800 dark:text-gray-500">
-              A complete website redesign for amalsolution.com, guided
-              by UX laws and supported with full design and handoff
-              documentation.
+              A complete website redesign for amalsolution.com, guided by UX
+              laws and supported with full design and handoff documentation.
             </p>
-            <a href="https://naufalabdussyakur.notion.site/Amal-Academy-E-Course-Website-1865d9ae1b9c80bf9fdbdefc464811a1?pvs=25">
+            <a
+              href="https://naufalabdussyakur.notion.site/Amal-Academy-E-Course-Website-1865d9ae1b9c80bf9fdbdefc464811a1?pvs=25"
+              className="cursor-pointer"
+              target="_blank"
+            >
               <div className="flex justify-center items-center px-6 py-4 w-full lg:w-fit gap-2 lg:gap-4 bg-black hover:bg-gray-900 dark:bg-white dark:hover:bg-gray-200 cursor-pointer rounded-full">
                 <p className="text-lg text-white dark:text-black font-medium">
                   View
@@ -160,7 +175,6 @@ export default function Portofolios() {
           </div>
         </div>
       </div>
-
     </div>
   );
 }
