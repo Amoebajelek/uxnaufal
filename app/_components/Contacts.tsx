@@ -13,6 +13,7 @@ export default function Contacts() {
           <a
             href="https://www.linkedin.com/in/naufalabdussyakur/"
             className="cursor-pointer"
+            target="_blank"
           >
             <div className="flex border-b-2 w-full justify-between items-center">
               <div className="flex flex-col">
@@ -30,6 +31,7 @@ export default function Contacts() {
           <a
             href="https://www.instagram.com/naufal.abdussyakur/"
             className="cursor-pointer"
+            target="_blank"
           >
             <div className="flex border-b-2 w-full justify-between items-center">
               <div className="flex flex-col">
@@ -44,7 +46,12 @@ export default function Contacts() {
               />
             </div>
           </a>
-          <div className="flex border-b-2 w-full justify-between items-center">
+          <a
+            href="/"
+            className="cursor-pointer"
+            target="_blank"
+          >
+            <div className="flex border-b-2 w-full justify-between items-center">
             <div className="flex flex-col">
               <h1 className="text-xl font-semibold text-black dark:text-white">
                 Threads
@@ -56,7 +63,13 @@ export default function Contacts() {
               className="text-black dark:text-white"
             />
           </div>
-          <div className="flex border-b-2 w-full justify-between items-center">
+          </a>
+          <a
+            href="/"
+            className="cursor-pointer"
+            target="_blank"
+          >
+            <div className="flex border-b-2 w-full justify-between items-center">
             <div className="flex flex-col">
               <h1 className="text-xl font-semibold text-black dark:text-white">
                 TikTok
@@ -68,6 +81,7 @@ export default function Contacts() {
               className="text-black dark:text-white"
             />
           </div>
+          </a>
         </div>
       </div>
     </div>
