@@ -18,13 +18,19 @@ export default function page() {
       {/* Start Header */}
       <div className="flex flex-col items-center min-h-screen p-6 bg-gray-100 dark:bg-black mt-24">
         <div className="flex flex-col w-full lg:w-8/12">
-          <div className="flex gap-2 w-full mb-12 items-center cursor-pointer text-gray-500 hover:text-gray-800">
-            <MdOutlineArrowRightAlt
-              size={24}
-              className="dark:text-gray-300 rotate-180"
-            />
-            <p className="text-lg font-medium">Back to Home</p>
-          </div>
+          <Link
+            href="/"
+            className="cursor-pointer"
+          >
+            <div className="flex gap-2 w-full mb-12 items-center cursor-pointer text-gray-500 hover:text-gray-800">
+              <MdOutlineArrowRightAlt
+                size={24}
+                className="dark:text-gray-300 rotate-180"
+              />
+              <p className="text-lg font-medium">Back to Home</p>
+            </div>
+          </Link>
+
           <div className="flex flex-col gap-2">
             <p className="text-lg text-gray-500 font-medium">
               Personal Project
@@ -89,15 +95,15 @@ export default function page() {
             </div>
             <div className="flex flex-col">
               <p className="text-lg text-gray-500 dark:text-gray-500">Link</p>
-              <a
+              <Link
                 href="https://aitiserve.co.id"
-                className="cursor-pointer"
+                className="cursor-pointer italic"
                 target="_blank"
               >
                 <p className="text-lg font-medium text-gray-800 dark:text-gray-500 italic">
                   Aitiserve.co.id
                 </p>
-              </a>
+              </Link>
             </div>
           </div>
           {/* End Header */}
