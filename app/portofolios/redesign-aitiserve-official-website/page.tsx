@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 import Navbar from "@/app/_components/Navbar";
 import { MdOutlineArrowRightAlt } from "react-icons/md";
@@ -30,13 +31,13 @@ export default function page() {
             </p>
             <h1 className="text-6xl font-bold text-black dark:text-white mb-4 uppercase">
               Redesign Official Website of{" "}
-              <a
+              <Link
                 href="https://aitiserve.co.id"
                 className="cursor-pointer italic"
                 target="_blank"
               >
                 AITISERVE.CO.ID
-              </a>
+              </Link>
             </h1>
           </div>
           <p className="text-lg text-gray-800 dark:text-gray-500">
@@ -181,8 +182,8 @@ export default function page() {
                   </li>
                   <li>
                     <span className="font-medium">About Us</span> : Offers a
-                    deeper understanding of AITISERVE&apos;’s vision, mission,
-                    and team.
+                    deeper understanding of AITISERVE&apos;&apos;s vision,
+                    mission, and team.
                   </li>
                   <li>
                     <span className="font-medium">Career</span> : Displays
@@ -249,12 +250,12 @@ export default function page() {
               </div>
               <p className="text-lg text-black dark:text-white">
                 In the redesign process, we applied foundational UX laws—such as
-                Hick’s Law, Fitts’s Law, and the Law of Proximity—to ensure
-                every design decision was backed by human-centered principles.
-                These laws helped streamline user interactions, improve visual
-                hierarchy, and create more intuitive experiences. By grounding
-                our design choices in proven UX principles, we enhanced
-                usability, clarity, and overall user satisfaction.
+                Hick&apos;s Law, Fitts&apos;s Law, and the Law of Proximity—to
+                ensure every design decision was backed by human-centered
+                principles. These laws helped streamline user interactions,
+                improve visual hierarchy, and create more intuitive experiences.
+                By grounding our design choices in proven UX principles, we
+                enhanced usability, clarity, and overall user satisfaction.
               </p>
               {/* End Right-Content : Solution #1 */}
               {/* Start Right-Content : Problem #2 */}
@@ -350,12 +351,12 @@ export default function page() {
                   Reflection
                 </p>
                 <h1 className="text-2xl font-bold text-black dark:text-white uppercase">
-                  What I've Learnt & Special Thanks
+                  What I&apos;ve Learnt & Special Thanks
                 </h1>
               </div>
               <div className="flex flex-col gap-2">
                 <p className="text-lg text-black dark:text-white">
-                  During this project, I've got the opportunity to:
+                  During this project, I&apos;ve got the opportunity to:
                 </p>
                 <ul className="list-disc ms-8 text-lg text-black dark:text-white space-y-1">
                   <li>Learn more about Design Thinking and Product Design.</li>
