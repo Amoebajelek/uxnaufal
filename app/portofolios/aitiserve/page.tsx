@@ -19,7 +19,7 @@ export default function page() {
       <div className="flex flex-col items-center min-h-screen p-6 bg-gray-100 dark:bg-black pt-28">
         <div className="flex flex-col w-full lg:w-8/12">
           {/* Start Header */}
-          <div className="felx felx-co">
+          <div className="felx felx-col">
             <Link href="/" className="cursor-pointer">
               <div className="flex gap-2 w-full mb-12 items-center cursor-pointer text-gray-500 hover:text-gray-800">
                 <MdOutlineArrowRightAlt
@@ -31,10 +31,10 @@ export default function page() {
             </Link>
             <div className="flex flex-col gap-2">
               <p className="text-lg text-gray-500 font-medium">
-                Personal Project
+                Redesign
               </p>
               <h1 className="text-6xl font-bold text-black dark:text-white mb-4 uppercase">
-                Redesign Official Website of{" "}
+                Official Website of{" "}
                 <Link
                   href="https://aitiserve.co.id"
                   className="cursor-pointer italic"
