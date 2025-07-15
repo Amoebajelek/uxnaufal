@@ -4,7 +4,7 @@ import { MdOutlineArrowRightAlt } from "react-icons/md";
 
 export default function Contacts() {
   return (
-    <div className="flex justify-center items-center mt-32">
+    <div className="flex justify-center items-center pt-32 bg-gray-100">
       <div className="flex flex-col md:flex-row w-10/12 lg:w-8/12 gap-12">
         <h1 className="text-2xl font-bold text-black dark:text-white w-full lg:w-1/3">
           @uxnaufal
