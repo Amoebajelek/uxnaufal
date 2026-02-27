@@ -10,7 +10,7 @@ import { MdOutlineArrowRightAlt } from "react-icons/md";
 
 export default function Portofolios() {
   return (
-    <div className="flex flex-col gap-18 justify-center items-center mt-12 lg:mt-0 bg-gray-100 dark:bg-black">
+    <div className="flex flex-col gap-18 justify-center items-center mt-12 pb-32 lg:mt-0 bg-gray-100 dark:bg-black">
       {/* Portofolio #0 - Aitiserve */}
       <div className="flex flex-col lg:flex-row gap-6 justify-center items-center w-10/12 lg:w-8/12">
         <div className="w-full lg:max-w-1/2 max-h-[400px] bg-black dark:bg-gray-100 rounded-3xl lg:rounded-4xl overflow-hidden border border-solid border-gray-100">
@@ -18,13 +18,15 @@ export default function Portofolios() {
         </div>
         <div className="flex flex-col w-full lg:w-1/2">
           <div className="flex flex-col gap-2">
-            <p className="text-lg text-gray-500 font-medium">Redesign</p>
+            <p className="text-lg text-gray-500 dark:text-gray-400 font-medium">
+              Redesign
+            </p>
             <h1 className="text-4xl font-bold text-black dark:text-white mb-4 uppercase">
               Official Website of Aitiserve
             </h1>
           </div>
           <div className="flex flex-col gap-4">
-            <p className="text-lg text-gray-800 dark:text-gray-500">
+            <p className="text-lg text-gray-800 dark:text-gray-300">
               A complete website redesign for Aitiserve, guided by UX laws and
               supported with full design and handoff documentation.
             </p>
@@ -59,13 +61,15 @@ export default function Portofolios() {
         </div>
         <div className="flex flex-col w-full lg:w-1/2">
           <div className="flex flex-col gap-2">
-            <p className="text-lg text-gray-500 font-medium">Redesign</p>
+            <p className="text-lg text-gray-500 dark:text-gray-400 font-medium">
+              Redesign
+            </p>
             <h1 className="text-4xl font-bold text-black dark:text-white mb-4 uppercase">
               Mobile Application by Papyrusphoto
             </h1>
           </div>
           <div className="flex flex-col gap-4">
-            <p className="text-lg text-gray-800 dark:text-gray-500">
+            <p className="text-lg text-gray-800 dark:text-gray-300">
               A complete website redesign for Papyrusphoto, guided by UX laws
               and supported with full design and handoff documentation.
             </p>
@@ -100,13 +104,15 @@ export default function Portofolios() {
         </div>
         <div className="flex flex-col w-full lg:w-1/2">
           <div className="flex flex-col gap-2">
-            <p className="text-lg text-gray-500 font-medium">Redesign</p>
+            <p className="text-lg text-gray-500 dark:text-gray-400 font-medium">
+              Redesign
+            </p>
             <h1 className="text-4xl font-bold text-black dark:text-white mb-4 uppercase">
               Product Catalog by Telkom Indonesia
             </h1>
           </div>
           <div className="flex flex-col gap-4">
-            <p className="text-lg text-gray-800 dark:text-gray-500">
+            <p className="text-lg text-gray-800 dark:text-gray-300">
               A complete website redesign for productcatalog.telkom.com, guided
               by UX laws and supported with full design and handoff
               documentation.
@@ -142,13 +148,15 @@ export default function Portofolios() {
         </div>
         <div className="flex flex-col w-full lg:w-1/2">
           <div className="flex flex-col gap-2">
-            <p className="text-lg text-gray-500 font-medium">Redesign</p>
+            <p className="text-lg text-gray-500 dark:text-gray-400 font-medium">
+              Redesign
+            </p>
             <h1 className="text-4xl font-bold text-black dark:text-white mb-4 uppercase">
               Bale Seni Barli by Kota Baru Parahyangan
             </h1>
           </div>
           <div className="flex flex-col gap-4">
-            <p className="text-lg text-gray-800 dark:text-gray-500">
+            <p className="text-lg text-gray-800 dark:text-gray-300">
               A complete website redesign for balesenibarli.blogspot.com, guided
               by UX laws and supported with full design and handoff
               documentation.
@@ -184,13 +192,15 @@ export default function Portofolios() {
         </div>
         <div className="flex flex-col w-full lg:w-1/2">
           <div className="flex flex-col gap-2">
-            <p className="text-lg text-gray-500 font-medium">New Design</p>
+            <p className="text-lg text-gray-500 dark:text-gray-400 font-medium">
+              New Design
+            </p>
             <h1 className="text-4xl font-bold text-black dark:text-white mb-4 uppercase">
               Amal Academy by Amal Solution
             </h1>
           </div>
           <div className="flex flex-col gap-4">
-            <p className="text-lg text-gray-800 dark:text-gray-500">
+            <p className="text-lg text-gray-800 dark:text-gray-300">
               A complete website redesign for amalsolution.com, guided by UX
               laws and supported with full design and handoff documentation.
             </p>
