@@ -1,13 +1,13 @@
 import { notFound } from "next/navigation";
-import { getProject, projects } from "@/lib/projects";
+import { readAllProjects } from "@/lib/data-store.server";
 import { PortfolioDetail } from "@/components/PortfolioDetail";
 
-export async function generateStaticParams() {
-  return projects.map((p) => ({ slug: p.slug }));
-}
+// No static params — always dynamic so admin changes show immediately
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const project = getProject(params.slug);
+  const projects = readAllProjects();
+  const project = projects.find((p) => p.slug === params.slug);
   if (!project) return {};
   return {
     title: `${project.title} — uxnaufal`,
@@ -16,7 +16,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 export default function ProjectPage({ params }: { params: { slug: string } }) {
-  const project = getProject(params.slug);
+  const projects = readAllProjects();
+  const project = projects.find((p) => p.slug === params.slug);
   if (!project) notFound();
   return <PortfolioDetail project={project} />;
 }
