@@ -29,5 +29,6 @@ next-env.d.ts
 
 # claude
 .claude/
-/data/portfolio.json
+# portfolio.json is committed as the CMS source of truth
+# admin-config.json contains credentials — never commit it
 /data/admin-config.json

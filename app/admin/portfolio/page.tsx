@@ -112,8 +112,8 @@ export default function AdminPortfolioList() {
                 <div className="font-medium text-sm truncate" style={{ color: "var(--text-primary)" }}>
                   {p.title}
                 </div>
-                <div className="text-xs" style={{ color: "var(--text-muted)" }}>
-                  {p.id}
+                <div className="text-xs font-mono" style={{ color: "var(--text-muted)" }}>
+                  /portfolio/{p.slug}
                 </div>
               </div>
 

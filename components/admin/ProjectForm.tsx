@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Plus, Trash2, ChevronDown, ChevronUp, Save, ArrowLeft, GripVertical,
@@ -354,6 +354,8 @@ export function ProjectForm({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  // Track whether user has manually edited the ID field (to stop auto-generating from title)
+  const idTouched = useRef(mode === "edit");
 
   const empty: Project = {
     id: "", slug: "", title: "", type: "Redesign",
@@ -458,10 +460,21 @@ export function ProjectForm({
         </div>
         <div className="flex items-center gap-3">
           {success && (
-            <span className="text-xs text-green-500 font-medium">✓ Tersimpan</span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium" style={{ color: "#22c55e" }}>✓ Tersimpan</span>
+              <a
+                href={`/portfolio/${form.slug || form.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs underline hover:opacity-70 transition-opacity"
+                style={{ color: "var(--accent)" }}
+              >
+                Lihat →
+              </a>
+            </div>
           )}
           {error && (
-            <span className="text-xs text-red-500">{error}</span>
+            <span className="text-xs" style={{ color: "#ef4444" }}>{error}</span>
           )}
           <button
             onClick={handleSave}
@@ -481,10 +494,11 @@ export function ProjectForm({
           {/* Card: Identitas */}
           <FormCard title="Identitas Proyek">
             <div className="grid grid-cols-2 gap-4">
-              <Field label="ID (slug unik)" hint="Auto-generate dari title jika kosong">
+              <Field label="ID (slug unik)" hint={mode === "new" ? "Auto-generate dari judul" : "Tidak bisa diubah setelah disimpan"}>
                 <Input
                   value={form.id}
                   onChange={(v) => {
+                    idTouched.current = true;
                     setField("id", v);
                     setField("slug", v);
                   }}
@@ -496,7 +510,19 @@ export function ProjectForm({
               </Field>
             </div>
             <Field label="Judul">
-              <Input value={form.title} onChange={(v) => setField("title", v)} placeholder="Judul proyek..." />
+              <Input
+                value={form.title}
+                onChange={(v) => {
+                  // In new mode, keep syncing id+slug from title until user manually edits ID
+                  if (mode === "new" && !idTouched.current) {
+                    const generated = slug(v);
+                    setForm((f) => ({ ...f, title: v, id: generated, slug: generated }));
+                  } else {
+                    setField("title", v);
+                  }
+                }}
+                placeholder="Judul proyek..."
+              />
             </Field>
             <Field label="Deskripsi Singkat">
               <Textarea
