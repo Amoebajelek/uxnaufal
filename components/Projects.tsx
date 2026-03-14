@@ -1,20 +1,22 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLang } from "./LanguageContext";
 
+const MotionLink = motion(Link);
+
 const projects = [
   {
     id: "aitiserve",
-    titleKey: "aitiserve.title",
     title: "Official Website of Aitiserve",
     type: "Website Redesign",
     description:
       "A complete website redesign guided by UX laws, with full design and handoff documentation. End-to-end product thinking from research to delivery.",
     tags: ["UX Research", "UI Design", "Handoff"],
-    href: "https://uxnaufal.vercel.app/portofolios/aitiserve",
+    href: "/portfolio/aitiserve",
     featured: true,
     color: "#1a1a1a",
     accent: "#c8ff57",
@@ -26,7 +28,7 @@ const projects = [
     description:
       "Complete tablet application redesign with a UX-first approach and comprehensive handoff documentation.",
     tags: ["Mobile UX", "Tablet", "Figma"],
-    href: "https://naufalabdussyakur.notion.site/PAPYRUS-PHOTO-Tablet-Application-1865d9ae1b9c808887a3e91b34d9031a",
+    href: "/portfolio/papyrusphoto",
     featured: false,
     color: "#111827",
     accent: "#60a5fa",
@@ -38,7 +40,7 @@ const projects = [
     description:
       "Enterprise-scale CMS product catalog redesign for Telkom Indonesia's digital ecosystem.",
     tags: ["Enterprise", "CMS", "Design System"],
-    href: "https://naufalabdussyakur.notion.site/CMS-Product-Catalog-Telkom-Product-Catalog-Website-1865d9ae1b9c8003a98fc129586a3b86",
+    href: "/portfolio/telkom",
     featured: false,
     color: "#0f172a",
     accent: "#f97316",
@@ -50,7 +52,7 @@ const projects = [
     description:
       "Cultural arts center website redesign by Kota Baru Parahyangan, focused on accessibility and visual identity.",
     tags: ["Cultural", "Accessibility", "Visual Design"],
-    href: "https://naufalabdussyakur.notion.site/Bale-Seni-Barli-Redesign-official-website-1865d9ae1b9c800c8dccf8b0c5e86be2",
+    href: "/portfolio/baleseni",
     featured: false,
     color: "#1c1917",
     accent: "#fb923c",
@@ -62,7 +64,7 @@ const projects = [
     description:
       "Complete e-learning platform design for Amal Solution, from information architecture to final UI.",
     tags: ["E-Learning", "New Design", "UX Strategy"],
-    href: "https://naufalabdussyakur.notion.site/Amal-Academy-E-Course-Website-1865d9ae1b9c80bf9fdbdefc464811a1",
+    href: "/portfolio/amalacademy",
     featured: false,
     color: "#0c0a09",
     accent: "#a78bfa",
@@ -81,10 +83,8 @@ function ProjectCard({
   const [hovered, setHovered] = useState(false);
 
   return (
-    <motion.a
+    <MotionLink
       href={project.href}
-      target="_blank"
-      rel="noopener noreferrer"
       className="group block rounded-2xl border overflow-hidden"
       style={{
         borderColor: hovered ? "var(--border-strong)" : "var(--border)",
@@ -193,7 +193,7 @@ function ProjectCard({
           ))}
         </div>
       </div>
-    </motion.a>
+    </MotionLink>
   );
 }
 
@@ -237,10 +237,8 @@ export function Projects() {
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 0.7, ease: easing }}
       >
-        <motion.a
+        <MotionLink
           href={featured.href}
-          target="_blank"
-          rel="noopener noreferrer"
           className="group grid grid-cols-1 md:grid-cols-5 rounded-2xl border overflow-hidden"
           style={{ borderColor: "var(--border)", backgroundColor: "var(--bg-secondary)" }}
           whileHover={{ y: -4, transition: { duration: 0.25 } }}
@@ -304,7 +302,7 @@ export function Projects() {
               <ArrowUpRight size={15} />
             </div>
           </div>
-        </motion.a>
+        </MotionLink>
       </motion.div>
 
       {/* Grid */}
