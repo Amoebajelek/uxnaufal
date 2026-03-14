@@ -37,12 +37,13 @@
 
   * { box-sizing: border-box; }
 
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: smooth; overflow-x: hidden; }
 
   body {
     background-color: var(--bg);
     color: var(--text-primary);
     font-family: var(--font-inter-tight);
+    overflow-x: hidden;
   }
 
   ::selection {

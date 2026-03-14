@@ -31,7 +31,7 @@ export function Hero() {
   return (
     <section
       ref={ref}
-      className="relative min-h-screen flex flex-col justify-center pt-24 pb-16 px-6 md:px-10 max-w-6xl mx-auto overflow-visible"
+      className="relative min-h-screen flex flex-col justify-center pt-24 pb-16 px-6 md:px-10 max-w-6xl mx-auto overflow-hidden"
     >
       {/* Floating background orbs */}
       {floatingShapes.map((s, i) => (
