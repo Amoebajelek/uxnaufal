@@ -13,7 +13,7 @@ export function PageTracker() {
 
   useEffect(() => {
     if (!pathname) return;
-    if (pathname.startsWith("/admin") || pathname.startsWith("/api")) return;
+    if (pathname.startsWith("/dashboard") || pathname.startsWith("/api")) return;
 
     // Session-level dedup via ref (cleared on new tab/window)
     if (tracked.current.has(pathname)) return;

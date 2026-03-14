@@ -428,7 +428,7 @@ export function ProjectForm({
       } else {
         setSuccess(true);
         if (mode === "new") {
-          router.push(`/admin/portfolio/${payload.id}`);
+          router.push(`/dashboard/portfolio/${payload.id}`);
         }
       }
     } catch {
