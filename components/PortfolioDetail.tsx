@@ -1,284 +1,393 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, ArrowUpRight, Calendar, Clock, User, Building2 } from "lucide-react";
 import { motion } from "framer-motion";
-import type { Project } from "@/lib/projects";
+import type { Project, ProjectSection } from "@/lib/projects";
 
 const easing = [0.16, 1, 0.3, 1] as const;
 
 function fadeUp(delay = 0) {
   return {
-    initial: { opacity: 0, y: 32 },
+    initial: { opacity: 0, y: 28 },
     whileInView: { opacity: 1, y: 0 },
     viewport: { once: true, margin: "-60px" },
     transition: { duration: 0.6, delay, ease: easing },
   };
 }
 
-/* ─── Mock screen visual (reused from Projects) ─── */
-function MockScreen({ color, accent }: { color: string; accent: string }) {
+/* ─── Section label (e.g. "Problem #1", "Solution #2") ─── */
+function SectionLabel({ label, accent }: { label?: string; accent: string }) {
+  if (!label) return null;
   return (
-    <div
-      className="w-full rounded-2xl overflow-hidden"
-      style={{ backgroundColor: color, aspectRatio: "16/9" }}
+    <p className="text-base font-medium mb-1.5" style={{ color: "var(--text-muted)" }}>
+      {label}
+    </p>
+  );
+}
+
+/* ─── Section heading ─── */
+function SectionHeading({ text }: { text: string }) {
+  return (
+    <h2
+      className="font-display font-bold text-2xl md:text-3xl uppercase leading-tight mb-4"
+      style={{ color: "var(--text-primary)" }}
     >
-      <div className="w-full h-full flex items-center justify-center p-10">
-        <div
-          className="w-full h-full rounded-xl border flex flex-col gap-4 p-6"
-          style={{
-            borderColor: "rgba(255,255,255,0.08)",
-            backgroundColor: "rgba(255,255,255,0.04)",
-          }}
+      {text}
+    </h2>
+  );
+}
+
+/* ─── Body text ─── */
+function BodyText({ text }: { text: string }) {
+  return (
+    <p className="text-base md:text-lg leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+      {text}
+    </p>
+  );
+}
+
+/* ─── Divider ─── */
+function Divider() {
+  return <div className="w-full h-px my-10" style={{ backgroundColor: "var(--border)" }} />;
+}
+
+/* ─── In a Nutshell ─── */
+function NutshellSection({ section, accent }: { section: ProjectSection; accent: string }) {
+  return (
+    <motion.div {...fadeUp(0)}>
+      <SectionLabel label={section.label} accent={accent} />
+      <SectionHeading text={section.heading} />
+      {section.content && <BodyText text={section.content} />}
+    </motion.div>
+  );
+}
+
+/* ─── Context with image + definition list ─── */
+function ContextSection({ section, accent }: { section: ProjectSection; accent: string }) {
+  return (
+    <motion.div {...fadeUp(0)}>
+      <SectionLabel label={section.label} accent={accent} />
+      <SectionHeading text={section.heading} />
+      {section.content && <BodyText text={section.content} />}
+
+      {section.image && (
+        <motion.div
+          className="w-full rounded-2xl overflow-hidden my-6"
+          style={{ backgroundColor: "var(--bg-secondary)" }}
+          initial={{ opacity: 0, scale: 0.97 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, ease: easing }}
         >
-          {/* Nav bar mock */}
-          <div className="flex items-center gap-2">
-            {[0, 1, 2].map((i) => (
-              <div
+          <Image
+            src={section.image}
+            alt={section.heading}
+            width={1600}
+            height={900}
+            className="w-full h-auto object-cover"
+          />
+        </motion.div>
+      )}
+
+      {section.boldList && (
+        <div className="mt-4">
+          <p className="text-base mb-3" style={{ color: "var(--text-secondary)" }}>
+            The main product flow includes:
+          </p>
+          <ol className="list-decimal ml-6 space-y-2">
+            {section.boldList.map((item, i) => (
+              <motion.li
                 key={i}
-                className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: i === 0 ? accent : "rgba(255,255,255,0.15)" }}
-              />
+                className="text-base"
+                style={{ color: "var(--text-secondary)" }}
+                initial={{ opacity: 0, x: -12 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.3, delay: i * 0.06, ease: easing }}
+              >
+                <span className="font-semibold" style={{ color: "var(--text-primary)" }}>
+                  {item.term}
+                </span>
+                {" "}— {item.desc}
+              </motion.li>
             ))}
-            <div className="flex-1 h-2.5 rounded-full ml-3" style={{ backgroundColor: "rgba(255,255,255,0.08)" }} />
-            <div className="w-16 h-6 rounded-lg" style={{ backgroundColor: accent, opacity: 0.9 }} />
-          </div>
-          {/* Hero mock */}
-          <div className="flex-1 flex gap-6 mt-2">
-            <div className="flex-1 flex flex-col gap-3">
-              <div className="h-8 w-3/4 rounded-xl" style={{ backgroundColor: "rgba(255,255,255,0.14)" }} />
-              <div className="h-4 w-full rounded-lg" style={{ backgroundColor: "rgba(255,255,255,0.07)" }} />
-              <div className="h-4 w-5/6 rounded-lg" style={{ backgroundColor: "rgba(255,255,255,0.07)" }} />
-              <div className="h-4 w-2/3 rounded-lg" style={{ backgroundColor: "rgba(255,255,255,0.05)" }} />
-              <div className="flex gap-2 mt-2">
-                <div className="h-9 w-28 rounded-full" style={{ backgroundColor: accent }} />
-                <div className="h-9 w-24 rounded-full border" style={{ borderColor: "rgba(255,255,255,0.2)" }} />
-              </div>
-            </div>
-            <div
-              className="w-2/5 rounded-2xl hidden md:block"
-              style={{ backgroundColor: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}
-            />
-          </div>
-          {/* Cards row */}
-          <div className="flex gap-3">
-            {[0, 1, 2].map((i) => (
-              <div
-                key={i}
-                className="flex-1 h-12 rounded-xl"
-                style={{
-                  backgroundColor: i === 0 ? `${accent}22` : "rgba(255,255,255,0.05)",
-                  border: `1px solid ${i === 0 ? `${accent}33` : "rgba(255,255,255,0.08)"}`,
-                }}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ─── Section renderers ─── */
-function MetricsSection({ section, accent }: { section: Project["sections"][0]; accent: string }) {
-  return (
-    <motion.div {...fadeUp(0)}>
-      <SectionLabel label={section.title} />
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {section.items?.map((item, i) => (
-          <motion.div
-            key={item.label}
-            className="rounded-2xl border p-6 text-center"
-            style={{ backgroundColor: "var(--bg-secondary)", borderColor: "var(--border)" }}
-            initial={{ opacity: 0, scale: 0.88 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: i * 0.08, ease: easing }}
-            whileHover={{ scale: 1.04, transition: { duration: 0.2 } }}
-          >
-            <div className="font-display font-extrabold text-3xl tracking-tight mb-1" style={{ color: accent }}>
-              {item.value}
-            </div>
-            <div className="font-medium text-sm mb-1" style={{ color: "var(--text-primary)" }}>
-              {item.label}
-            </div>
-            {item.desc && (
-              <div className="text-xs font-light" style={{ color: "var(--text-muted)" }}>
-                {item.desc}
-              </div>
-            )}
-          </motion.div>
-        ))}
-      </div>
-    </motion.div>
-  );
-}
-
-function TextSection({ section }: { section: Project["sections"][0] }) {
-  return (
-    <motion.div {...fadeUp(0)}>
-      <SectionLabel label={section.title} />
-      <p className="text-base md:text-lg leading-relaxed font-light" style={{ color: "var(--text-secondary)" }}>
-        {section.content}
-      </p>
-    </motion.div>
-  );
-}
-
-function ProcessSection({ section, accent }: { section: Project["sections"][0]; accent: string }) {
-  return (
-    <motion.div {...fadeUp(0)}>
-      <SectionLabel label={section.title} />
-      <div className="flex flex-col gap-0">
-        {section.steps?.map((step, i) => (
-          <motion.div
-            key={step.title}
-            className="flex gap-6 pb-8 relative"
-            initial={{ opacity: 0, x: -24 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: i * 0.1, ease: easing }}
-          >
-            {/* Timeline line */}
-            {i < (section.steps?.length ?? 0) - 1 && (
-              <div
-                className="absolute left-5 top-12 bottom-0 w-px"
-                style={{ backgroundColor: "var(--border)" }}
-              />
-            )}
-            {/* Icon */}
-            <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center text-base shrink-0 mt-0.5 z-10"
-              style={{
-                backgroundColor: "var(--accent-bg)",
-                border: "1px solid var(--accent-border)",
-                color: "var(--accent)",
-              }}
-            >
-              {step.icon}
-            </div>
-            {/* Content */}
-            <div className="flex-1">
-              <div className="font-display font-semibold text-base mb-1.5" style={{ color: "var(--text-primary)" }}>
-                {step.title}
-              </div>
-              <p className="text-sm leading-relaxed font-light mb-3" style={{ color: "var(--text-secondary)" }}>
-                {step.desc}
-              </p>
-              {step.tools && (
-                <div className="flex flex-wrap gap-2">
-                  {step.tools.map((t) => (
-                    <span
-                      key={t}
-                      className="text-xs px-2.5 py-1 rounded-full border"
-                      style={{ borderColor: "var(--border-strong)", color: "var(--text-muted)" }}
-                    >
-                      {t}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </motion.div>
-  );
-}
-
-function FeaturesSection({ section }: { section: Project["sections"][0] }) {
-  return (
-    <motion.div {...fadeUp(0)}>
-      <SectionLabel label={section.title} />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {section.features?.map((f, i) => (
-          <motion.div
-            key={f.title}
-            className="rounded-2xl border p-6"
-            style={{ backgroundColor: "var(--bg-secondary)", borderColor: "var(--border)" }}
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: i * 0.08, ease: easing }}
-            whileHover={{ y: -4, borderColor: "var(--accent-border)", transition: { duration: 0.2 } }}
-          >
-            <div
-              className="w-9 h-9 rounded-lg flex items-center justify-center text-sm mb-4"
-              style={{
-                backgroundColor: "var(--accent-bg)",
-                border: "1px solid var(--accent-border)",
-                color: "var(--accent)",
-              }}
-            >
-              {f.icon}
-            </div>
-            <div className="font-display font-semibold text-sm mb-2" style={{ color: "var(--text-primary)" }}>
-              {f.title}
-            </div>
-            <p className="text-sm leading-relaxed font-light" style={{ color: "var(--text-secondary)" }}>
-              {f.desc}
-            </p>
-          </motion.div>
-        ))}
-      </div>
-    </motion.div>
-  );
-}
-
-function QuoteSection({ section }: { section: Project["sections"][0] }) {
-  return (
-    <motion.div
-      className="rounded-2xl border p-8 md:p-10"
-      style={{ backgroundColor: "var(--accent-bg)", borderColor: "var(--accent-border)" }}
-      {...fadeUp(0)}
-    >
-      <div className="text-4xl mb-4" style={{ color: "var(--accent)", lineHeight: 1 }}>
-        "
-      </div>
-      <p className="text-lg md:text-xl leading-relaxed font-light italic mb-4" style={{ color: "var(--text-primary)" }}>
-        {section.quote}
-      </p>
-      {section.author && (
-        <div className="text-sm font-medium" style={{ color: "var(--text-muted)" }}>
-          — {section.author}
+          </ol>
         </div>
       )}
     </motion.div>
   );
 }
 
-function SectionLabel({ label }: { label?: string }) {
-  if (!label) return null;
+/* ─── Problem Discovery ─── */
+function ProblemDiscoverySection({ section, accent }: { section: ProjectSection; accent: string }) {
   return (
-    <div className="mb-8">
-      <span
-        className="text-xs uppercase tracking-widest font-medium block mb-2"
-        style={{ color: "var(--accent)" }}
+    <motion.div {...fadeUp(0)}>
+      <SectionLabel label={section.label} accent={accent} />
+      <SectionHeading text={section.heading} />
+      {section.content && <BodyText text={section.content} />}
+    </motion.div>
+  );
+}
+
+/* ─── Problem (numbered, with optional image) ─── */
+function ProblemSection({ section, accent }: { section: ProjectSection; accent: string }) {
+  return (
+    <motion.div {...fadeUp(0)}>
+      <div
+        className="inline-block text-xs uppercase tracking-widest font-semibold px-3 py-1.5 rounded-full mb-4"
+        style={{ backgroundColor: "rgba(239,68,68,0.1)", color: "#ef4444", border: "1px solid rgba(239,68,68,0.2)" }}
       >
-        ◈ Section
-      </span>
+        {section.label}
+      </div>
+      <SectionHeading text={section.heading} />
+      {section.content && <BodyText text={section.content} />}
+
+      {section.image && (
+        <div className="mt-4">
+          <p className="text-sm font-semibold mb-3" style={{ color: "var(--text-primary)" }}>Preview</p>
+          <motion.div
+            className="w-full rounded-xl overflow-hidden"
+            style={{ backgroundColor: "var(--bg-secondary)" }}
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, ease: easing }}
+          >
+            <Image
+              src={section.image}
+              alt={section.heading}
+              width={1600}
+              height={900}
+              className="w-full h-auto object-cover"
+            />
+          </motion.div>
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
+/* ─── Solution ─── */
+function SolutionSection({ section, accent }: { section: ProjectSection; accent: string }) {
+  return (
+    <motion.div
+      className="rounded-2xl border p-6 md:p-8"
+      style={{ backgroundColor: "var(--accent-bg)", borderColor: "var(--accent-border)" }}
+      {...fadeUp(0)}
+    >
+      <div
+        className="inline-block text-xs uppercase tracking-widest font-semibold px-3 py-1.5 rounded-full mb-4"
+        style={{ backgroundColor: "var(--accent-bg)", color: accent, border: `1px solid ${accent}33` }}
+      >
+        {section.label}
+      </div>
+      <SectionHeading text={section.heading} />
+      {section.content && <BodyText text={section.content} />}
+    </motion.div>
+  );
+}
+
+/* ─── Final Design (image gallery) ─── */
+function FinalDesignSection({ section, accent }: { section: ProjectSection; accent: string }) {
+  return (
+    <motion.div {...fadeUp(0)}>
+      <SectionLabel label={section.label} accent={accent} />
+      <SectionHeading text={section.heading} />
+
+      <div className="flex flex-col gap-8 mt-6">
+        {section.items?.map((item, i) => (
+          <motion.div
+            key={i}
+            className="flex flex-col gap-3"
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: i * 0.12, ease: easing }}
+          >
+            <p className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+              {item.label}
+            </p>
+            <div
+              className="w-full rounded-xl overflow-hidden"
+              style={{ backgroundColor: "var(--bg-secondary)" }}
+            >
+              <Image
+                src={item.image}
+                alt={item.label}
+                width={1600}
+                height={900}
+                className="w-full h-auto object-cover"
+              />
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+/* ─── Reflection ─── */
+function ReflectionSection({ section, accent }: { section: ProjectSection; accent: string }) {
+  return (
+    <motion.div {...fadeUp(0)}>
+      <SectionLabel label={section.label} accent={accent} />
+      <SectionHeading text={section.heading} />
+      {section.content && (
+        <p className="text-base mb-4" style={{ color: "var(--text-secondary)" }}>{section.content}</p>
+      )}
+
+      {section.learnings && (
+        <ul className="list-disc ml-6 space-y-2 mb-6">
+          {section.learnings.map((l, i) => (
+            <motion.li
+              key={i}
+              className="text-base"
+              style={{ color: "var(--text-secondary)" }}
+              initial={{ opacity: 0, x: -10 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.3, delay: i * 0.07 }}
+            >
+              {l}
+            </motion.li>
+          ))}
+        </ul>
+      )}
+
+      {section.collaborators && section.collaborators.length > 0 && (
+        <div className="mt-4">
+          <p className="text-base font-semibold mb-3" style={{ color: "var(--text-primary)" }}>
+            Shoutout to all collaborators
+          </p>
+          <p className="text-base mb-2" style={{ color: "var(--text-secondary)" }}>
+            Huge shoutout to everyone I collaborated with during this project
+          </p>
+          <ul className="list-disc ml-6 space-y-1">
+            {section.collaborators.map((c, i) => (
+              <li key={i} className="text-base" style={{ color: "var(--text-secondary)" }}>
+                {c}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
+/* ─── Notion-only placeholder ─── */
+function NotionOnlySection({ section, accent, externalHref }: { section: ProjectSection; accent: string; externalHref?: string }) {
+  return (
+    <motion.div
+      className="flex flex-col items-center text-center py-16 px-8 rounded-2xl border"
+      style={{ backgroundColor: "var(--bg-secondary)", borderColor: "var(--border)" }}
+      {...fadeUp(0)}
+    >
+      <div
+        className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mb-6"
+        style={{ backgroundColor: "var(--accent-bg)", border: "1px solid var(--accent-border)" }}
+      >
+        📋
+      </div>
       <h2
-        className="font-display font-bold text-2xl md:text-3xl tracking-tight"
+        className="font-display font-bold text-xl md:text-2xl mb-4"
         style={{ color: "var(--text-primary)" }}
       >
-        {label}
+        {section.heading}
       </h2>
+      <p
+        className="text-base leading-relaxed max-w-lg mb-8"
+        style={{ color: "var(--text-secondary)" }}
+      >
+        {section.content}
+      </p>
+      {externalHref && (
+        <a
+          href={externalHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full text-sm font-semibold transition-all hover:opacity-85 active:scale-95"
+          style={{ backgroundColor: accent, color: "#0a0a0a" }}
+        >
+          Read Full Case Study
+          <ArrowUpRight size={15} />
+        </a>
+      )}
+    </motion.div>
+  );
+}
+
+/* ─── Section renderer ─── */
+function RenderSection({
+  section,
+  accent,
+  externalHref,
+}: {
+  section: ProjectSection;
+  accent: string;
+  externalHref?: string;
+}) {
+  switch (section.type) {
+    case "nutshell":
+      return <NutshellSection section={section} accent={accent} />;
+    case "context":
+      return <ContextSection section={section} accent={accent} />;
+    case "problem-discovery":
+      return <ProblemDiscoverySection section={section} accent={accent} />;
+    case "problem":
+      return <ProblemSection section={section} accent={accent} />;
+    case "solution":
+      return <SolutionSection section={section} accent={accent} />;
+    case "finaldesign":
+      return <FinalDesignSection section={section} accent={accent} />;
+    case "reflection":
+      return <ReflectionSection section={section} accent={accent} />;
+    case "notion-only":
+      return <NotionOnlySection section={section} accent={accent} externalHref={externalHref} />;
+    default:
+      return null;
+  }
+}
+
+/* ─── Sidebar nav ─── */
+function SidebarNav({ sections }: { sections: ProjectSection[] }) {
+  const labels = sections.map((s) => s.label).filter(Boolean) as string[];
+  if (labels.length < 3) return null;
+
+  return (
+    <div className="hidden lg:flex flex-col w-48 shrink-0">
+      <div className="sticky top-28 flex flex-col gap-2">
+        {labels.map((label) => (
+          <span
+            key={label}
+            className="text-sm cursor-default transition-opacity hover:opacity-100 opacity-50"
+            style={{ color: "var(--text-secondary)" }}
+          >
+            {label}
+          </span>
+        ))}
+      </div>
     </div>
   );
 }
 
 /* ─── Main component ─── */
 export function PortfolioDetail({ project }: { project: Project }) {
+  const isNotionOnly =
+    project.sections.length === 1 && project.sections[0].type === "notion-only";
+
   const meta = [
-    { icon: Calendar, label: "Year", value: project.year },
-    { icon: Clock, label: "Duration", value: project.duration },
-    { icon: User, label: "Role", value: project.role },
-    { icon: Building2, label: "Client", value: project.client },
-  ];
+    project.year && { icon: Calendar, label: "Year", value: project.year },
+    project.duration && { icon: Clock, label: "Duration", value: project.duration },
+    project.role && { icon: User, label: "Role", value: project.role },
+    project.client && { icon: Building2, label: "Client", value: project.client },
+  ].filter(Boolean) as { icon: typeof Calendar; label: string; value: string }[];
 
   return (
     <div style={{ backgroundColor: "var(--bg)", minHeight: "100vh" }}>
-      {/* Sticky top nav */}
+      {/* Sticky nav */}
       <nav
         className="fixed top-0 left-0 right-0 z-50 h-16 flex items-center px-6 md:px-10"
         style={{
@@ -287,7 +396,7 @@ export function PortfolioDetail({ project }: { project: Project }) {
           borderBottom: "1px solid var(--border)",
         }}
       >
-        <div className="max-w-4xl mx-auto w-full flex items-center justify-between">
+        <div className="max-w-5xl mx-auto w-full flex items-center justify-between">
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-sm font-medium transition-opacity hover:opacity-70"
@@ -306,19 +415,23 @@ export function PortfolioDetail({ project }: { project: Project }) {
         </div>
       </nav>
 
-      <main className="pt-24 pb-32 px-6 md:px-10 max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-16">
+      <main className="pt-24 pb-32 px-6 md:px-10 max-w-5xl mx-auto">
+        {/* ── Header ── */}
+        <div className="mb-12">
           {/* Type badge */}
           <motion.div
             className="inline-flex items-center gap-2 mb-6"
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: easing }}
+            transition={{ duration: 0.4, ease: easing }}
           >
             <span
               className="text-xs px-3 py-1.5 rounded-full border font-medium"
-              style={{ borderColor: "var(--accent-border)", color: "var(--accent)", backgroundColor: "var(--accent-bg)" }}
+              style={{
+                borderColor: "var(--accent-border)",
+                color: "var(--accent)",
+                backgroundColor: "var(--accent-bg)",
+              }}
             >
               {project.type}
             </span>
@@ -329,32 +442,52 @@ export function PortfolioDetail({ project }: { project: Project }) {
 
           {/* Title */}
           <motion.h1
-            className="font-display font-extrabold text-4xl md:text-5xl lg:text-6xl tracking-tight leading-[1.05] mb-6"
+            className="font-display font-extrabold text-4xl md:text-5xl lg:text-6xl tracking-tight leading-[1.05] uppercase mb-5"
             style={{ color: "var(--text-primary)" }}
-            initial={{ opacity: 0, y: 28 }}
+            initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, delay: 0.08, ease: easing }}
+            transition={{ duration: 0.6, delay: 0.07, ease: easing }}
           >
             {project.title}
           </motion.h1>
 
-          {/* Long desc */}
+          {/* Description */}
           <motion.p
-            className="text-base md:text-lg leading-relaxed font-light max-w-2xl mb-10"
+            className="text-base md:text-lg leading-relaxed max-w-2xl mb-8"
             style={{ color: "var(--text-secondary)" }}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.16, ease: easing }}
+            transition={{ duration: 0.5, delay: 0.14, ease: easing }}
           >
-            {project.longDesc}
+            {project.description}
           </motion.p>
+
+          {/* Skills tags */}
+          {project.skills && (
+            <motion.div
+              className="flex flex-wrap gap-3 mb-8"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
+            >
+              {project.skills.map((s) => (
+                <span
+                  key={s}
+                  className="text-sm font-medium"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  {s}
+                </span>
+              ))}
+            </motion.div>
+          )}
 
           {/* Meta row */}
           <motion.div
-            className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
-            initial={{ opacity: 0, y: 16 }}
+            className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8"
+            initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.24, ease: easing }}
+            transition={{ duration: 0.5, delay: 0.22, ease: easing }}
           >
             {meta.map((m) => (
               <div
@@ -362,40 +495,41 @@ export function PortfolioDetail({ project }: { project: Project }) {
                 className="rounded-2xl border p-4"
                 style={{ backgroundColor: "var(--bg-secondary)", borderColor: "var(--border)" }}
               >
-                <div className="flex items-center gap-2 mb-1.5">
-                  <m.icon size={13} style={{ color: "var(--accent)" }} />
-                  <span className="text-xs uppercase tracking-widest font-medium" style={{ color: "var(--text-muted)" }}>
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  <m.icon size={12} style={{ color: "var(--accent)" }} />
+                  <span
+                    className="text-xs uppercase tracking-widest font-medium"
+                    style={{ color: "var(--text-muted)" }}
+                  >
                     {m.label}
                   </span>
                 </div>
-                <div className="font-display font-semibold text-sm" style={{ color: "var(--text-primary)" }}>
+                <div
+                  className="font-display font-semibold text-sm"
+                  style={{ color: "var(--text-primary)" }}
+                >
                   {m.value}
                 </div>
               </div>
             ))}
           </motion.div>
 
-          {/* Tags + tools */}
+          {/* Tags */}
           <motion.div
             className="flex flex-wrap gap-2"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.4, delay: 0.32 }}
+            transition={{ duration: 0.4, delay: 0.28 }}
           >
             {project.tags.map((t) => (
               <span
                 key={t}
                 className="text-xs px-3 py-1.5 rounded-full border"
-                style={{ borderColor: "var(--accent-border)", color: "var(--accent)", backgroundColor: "var(--accent-bg)" }}
-              >
-                {t}
-              </span>
-            ))}
-            {project.tools.map((t) => (
-              <span
-                key={t}
-                className="text-xs px-3 py-1.5 rounded-full border"
-                style={{ borderColor: "var(--border-strong)", color: "var(--text-muted)" }}
+                style={{
+                  borderColor: "var(--accent-border)",
+                  color: "var(--accent)",
+                  backgroundColor: "var(--accent-bg)",
+                }}
               >
                 {t}
               </span>
@@ -403,70 +537,101 @@ export function PortfolioDetail({ project }: { project: Project }) {
           </motion.div>
         </div>
 
-        {/* Hero visual */}
-        <motion.div
-          className="mb-20"
-          initial={{ opacity: 0, scale: 0.97 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.7, delay: 0.2, ease: easing }}
-        >
-          <MockScreen color={project.color} accent={project.accent} />
-        </motion.div>
+        {/* ── Thumbnail ── */}
+        {project.thumbnail && (
+          <motion.div
+            className="mb-14 w-full rounded-2xl overflow-hidden"
+            style={{ backgroundColor: project.color }}
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.7, delay: 0.18, ease: easing }}
+          >
+            <Image
+              src={project.thumbnail}
+              alt={project.title}
+              width={1600}
+              height={900}
+              className="w-full h-auto object-cover"
+              priority
+            />
+          </motion.div>
+        )}
 
-        {/* Sections */}
-        <div className="flex flex-col gap-20">
-          {project.sections.map((section, i) => {
-            if (section.type === "metrics")
-              return <MetricsSection key={i} section={section} accent={project.accent} />;
-            if (section.type === "text")
-              return <TextSection key={i} section={section} />;
-            if (section.type === "process")
-              return <ProcessSection key={i} section={section} accent={project.accent} />;
-            if (section.type === "features")
-              return <FeaturesSection key={i} section={section} />;
-            if (section.type === "quote")
-              return <QuoteSection key={i} section={section} />;
-            return null;
-          })}
+        {/* ── Body: sidebar + content ── */}
+        <div className="flex gap-12">
+          {!isNotionOnly && <SidebarNav sections={project.sections} />}
+
+          <div className="flex-1 flex flex-col gap-0">
+            {project.sections.map((section, i) => (
+              <div key={i}>
+                <RenderSection
+                  section={section}
+                  accent={project.accent}
+                  externalHref={project.externalHref}
+                />
+                {i < project.sections.length - 1 && <Divider />}
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Footer CTA */}
-        <motion.div
-          className="mt-24 pt-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
-          style={{ borderTop: "1px solid var(--border)" }}
-          {...fadeUp(0)}
-        >
-          <div>
-            <div className="text-xs uppercase tracking-widest font-medium mb-2" style={{ color: "var(--accent)" }}>
-              Next step
-            </div>
-            <div className="font-display font-bold text-xl" style={{ color: "var(--text-primary)" }}>
-              Want to see the full case study?
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            {project.externalHref && (
-              <a
-                href={project.externalHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-full text-sm font-medium transition-all hover:opacity-85 active:scale-95"
-                style={{ backgroundColor: "var(--accent)", color: "#0a0a0a" }}
+        {/* ── Footer CTA ── */}
+        {!isNotionOnly && (
+          <motion.div
+            className="mt-20 pt-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
+            style={{ borderTop: "1px solid var(--border)" }}
+            {...fadeUp(0)}
+          >
+            <div>
+              <div
+                className="text-xs uppercase tracking-widest font-medium mb-1.5"
+                style={{ color: "var(--accent)" }}
               >
-                View full case study
-                <ArrowUpRight size={14} />
-              </a>
-            )}
-            <Link
-              href="/#works"
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-full text-sm font-medium border transition-all hover:opacity-80"
-              style={{ borderColor: "var(--border-strong)", color: "var(--text-secondary)" }}
-            >
-              <ArrowLeft size={14} />
-              All projects
-            </Link>
-          </div>
-        </motion.div>
+                Next step
+              </div>
+              <div
+                className="font-display font-bold text-xl"
+                style={{ color: "var(--text-primary)" }}
+              >
+                Want to see the full case study?
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              {project.liveUrl && (
+                <a
+                  href={project.liveUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-3 rounded-full text-sm font-medium transition-all hover:opacity-85 active:scale-95 border"
+                  style={{ borderColor: "var(--border-strong)", color: "var(--text-secondary)" }}
+                >
+                  Live Site
+                  <ArrowUpRight size={14} />
+                </a>
+              )}
+              {project.externalHref && (
+                <a
+                  href={project.externalHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-3 rounded-full text-sm font-medium transition-all hover:opacity-85 active:scale-95"
+                  style={{ backgroundColor: project.accent, color: "#0a0a0a" }}
+                >
+                  View on Notion
+                  <ArrowUpRight size={14} />
+                </a>
+              )}
+              <Link
+                href="/#works"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-full text-sm font-medium border transition-all hover:opacity-80"
+                style={{ borderColor: "var(--border-strong)", color: "var(--text-secondary)" }}
+              >
+                <ArrowLeft size={14} />
+                All projects
+              </Link>
+            </div>
+          </motion.div>
+        )}
       </main>
     </div>
   );
