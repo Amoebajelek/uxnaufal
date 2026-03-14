@@ -10,26 +10,28 @@ import type { Project } from "@/lib/projects";
 export const dynamic = "force-dynamic";
 
 // GET /api/admin/projects/[id]
-export async function GET(_req: Request, { params }: { params: { id: string } }) {
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   await seedIfEmpty();
-  const project = await readOneProject(params.id);
+  const project = await readOneProject(id);
   if (!project) return NextResponse.json({ error: "Not found" }, { status: 404 });
   return NextResponse.json(project);
 }
 
 // PUT /api/admin/projects/[id]  → update
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   try {
     await seedIfEmpty();
     const body = (await request.json()) as Project;
 
-    const existing = await readOneProject(params.id);
+    const existing = await readOneProject(id);
     if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
     const updated: Project = {
       ...body,
-      id:   params.id,
-      slug: body.slug || params.id,
+      id,
+      slug: body.slug || id,
     };
 
     await upsertProject(updated);
@@ -42,9 +44,10 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 }
 
 // DELETE /api/admin/projects/[id]
-export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   await seedIfEmpty();
-  const ok = await deleteProject(params.id);
+  const ok = await deleteProject(id);
   if (!ok) return NextResponse.json({ error: "Not found" }, { status: 404 });
   return NextResponse.json({ success: true });
 }
