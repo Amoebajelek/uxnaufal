@@ -2,9 +2,15 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import { ArrowLeft, ArrowUpRight, Calendar, Clock, User, Building2 } from "lucide-react";
 import { motion } from "framer-motion";
 import type { Project, ProjectSection } from "@/lib/projects";
+
+/* ─── Convert label → DOM id ─── */
+function labelToId(label: string): string {
+  return "section-" + label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
 
 const easing = [0.16, 1, 0.3, 1] as const;
 
@@ -352,22 +358,83 @@ function RenderSection({
 }
 
 /* ─── Sidebar nav ─── */
-function SidebarNav({ sections }: { sections: ProjectSection[] }) {
+function SidebarNav({ sections, accent }: { sections: ProjectSection[]; accent: string }) {
   const labels = sections.map((s) => s.label).filter(Boolean) as string[];
+  const [activeId, setActiveId] = useState<string>("");
+
+  useEffect(() => {
+    if (labels.length < 3) return;
+
+    const ids = labels.map(labelToId);
+    const observers: IntersectionObserver[] = [];
+
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const obs = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) setActiveId(id);
+        },
+        { rootMargin: "-20% 0px -70% 0px", threshold: 0 }
+      );
+      obs.observe(el);
+      observers.push(obs);
+    });
+
+    return () => observers.forEach((o) => o.disconnect());
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sections]);
+
   if (labels.length < 3) return null;
 
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    e.preventDefault();
+    const el = document.getElementById(id);
+    if (!el) return;
+    const offset = 96; // sticky nav height + padding
+    const top = el.getBoundingClientRect().top + window.scrollY - offset;
+    window.scrollTo({ top, behavior: "smooth" });
+    setActiveId(id);
+  };
+
   return (
-    <div className="hidden lg:flex flex-col w-48 shrink-0">
-      <div className="sticky top-28 flex flex-col gap-2">
-        {labels.map((label) => (
-          <span
-            key={label}
-            className="text-sm cursor-default transition-opacity hover:opacity-100 opacity-50"
-            style={{ color: "var(--text-secondary)" }}
-          >
-            {label}
-          </span>
-        ))}
+    <div className="hidden lg:flex flex-col w-44 shrink-0">
+      <div className="sticky top-28 flex flex-col gap-1">
+        {labels.map((label) => {
+          const id = labelToId(label);
+          const isActive = activeId === id;
+          return (
+            <a
+              key={label}
+              href={`#${id}`}
+              onClick={(e) => handleClick(e, id)}
+              className="group flex items-center gap-2.5 py-1.5 text-sm transition-all duration-200"
+              style={{
+                color: isActive ? "var(--text-primary)" : "var(--text-muted)",
+                textDecoration: "none",
+              }}
+            >
+              {/* Active indicator bar */}
+              <span
+                className="shrink-0 h-4 rounded-full transition-all duration-200"
+                style={{
+                  width: isActive ? "3px" : "2px",
+                  backgroundColor: isActive ? accent : "var(--border-strong)",
+                  opacity: isActive ? 1 : 0.4,
+                }}
+              />
+              <span
+                className="transition-all duration-200 leading-snug"
+                style={{
+                  fontWeight: isActive ? 500 : 400,
+                  opacity: isActive ? 1 : 0.55,
+                }}
+              >
+                {label}
+              </span>
+            </a>
+          );
+        })}
       </div>
     </div>
   );
@@ -559,11 +626,14 @@ export function PortfolioDetail({ project }: { project: Project }) {
 
         {/* ── Body: sidebar + content ── */}
         <div className="flex gap-12">
-          {!isNotionOnly && <SidebarNav sections={project.sections} />}
+          {!isNotionOnly && <SidebarNav sections={project.sections} accent={project.accent} />}
 
           <div className="flex-1 flex flex-col gap-0">
             {project.sections.map((section, i) => (
-              <div key={i}>
+              <div
+                key={i}
+                id={section.label ? labelToId(section.label) : undefined}
+              >
                 <RenderSection
                   section={section}
                   accent={project.accent}
