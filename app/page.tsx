@@ -6,14 +6,19 @@ import { Skills } from "@/components/Skills";
 import { About } from "@/components/About";
 import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
+import { readAllProjects } from "@/lib/data-store.server";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const projects = await readAllProjects();
+
   return (
     <main>
       <Navbar />
       <Hero />
       <SocialStrip />
-      <Projects />
+      <Projects projects={projects} />
       <Skills />
       <About />
       <Contact />

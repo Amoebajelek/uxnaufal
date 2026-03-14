@@ -5,86 +5,18 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLang } from "./LanguageContext";
+import type { Project } from "@/lib/projects";
 
 const MotionLink = motion(Link);
 
-const projects = [
-  {
-    id: "aitiserve",
-    title: "Official Website of Aitiserve",
-    type: "Website Redesign",
-    description:
-      "A complete website redesign guided by UX laws, with full design and handoff documentation. End-to-end product thinking from research to delivery.",
-    tags: ["UX Research", "UI Design", "Handoff"],
-    href: "/portfolio/aitiserve",
-    featured: true,
-    color: "#1a1a1a",
-    accent: "#c8ff57",
-  },
-  {
-    id: "papyrusphoto",
-    title: "Mobile App by Papyrusphoto",
-    type: "Tablet Application",
-    description:
-      "Complete tablet application redesign with a UX-first approach and comprehensive handoff documentation.",
-    tags: ["Mobile UX", "Tablet", "Figma"],
-    href: "/portfolio/papyrusphoto",
-    featured: false,
-    color: "#111827",
-    accent: "#60a5fa",
-  },
-  {
-    id: "telkom",
-    title: "Product Catalog — Telkom Indonesia",
-    type: "Enterprise CMS",
-    description:
-      "Enterprise-scale CMS product catalog redesign for Telkom Indonesia's digital ecosystem.",
-    tags: ["Enterprise", "CMS", "Design System"],
-    href: "/portfolio/telkom",
-    featured: false,
-    color: "#0f172a",
-    accent: "#f97316",
-  },
-  {
-    id: "baleseni",
-    title: "Bale Seni Barli",
-    type: "Website Redesign",
-    description:
-      "Cultural arts center website redesign by Kota Baru Parahyangan, focused on accessibility and visual identity.",
-    tags: ["Cultural", "Accessibility", "Visual Design"],
-    href: "/portfolio/baleseni",
-    featured: false,
-    color: "#1c1917",
-    accent: "#fb923c",
-  },
-  {
-    id: "amalacademy",
-    title: "Amal Academy — E-Course Platform",
-    type: "New Design",
-    description:
-      "Complete e-learning platform design for Amal Solution, from information architecture to final UI.",
-    tags: ["E-Learning", "New Design", "UX Strategy"],
-    href: "/portfolio/amalacademy",
-    featured: false,
-    color: "#0c0a09",
-    accent: "#a78bfa",
-  },
-];
-
 const easing = [0.16, 1, 0.3, 1] as const;
 
-function ProjectCard({
-  project,
-  index,
-}: {
-  project: (typeof projects)[0];
-  index: number;
-}) {
+function ProjectCard({ project, index }: { project: Project; index: number }) {
   const [hovered, setHovered] = useState(false);
 
   return (
     <MotionLink
-      href={project.href}
+      href={`/portfolio/${project.slug}`}
       className="group block rounded-2xl border overflow-hidden"
       style={{
         borderColor: hovered ? "var(--border-strong)" : "var(--border)",
@@ -103,7 +35,7 @@ function ProjectCard({
         className="relative overflow-hidden"
         style={{
           backgroundColor: project.color,
-          height: project.featured ? "280px" : "200px",
+          height: "200px",
         }}
       >
         <div className="absolute inset-0 flex items-center justify-center p-8">
@@ -197,9 +129,11 @@ function ProjectCard({
   );
 }
 
-export function Projects() {
+export function Projects({ projects }: { projects: Project[] }) {
   const [featured, ...rest] = projects;
   const { t } = useLang();
+
+  if (!featured) return null;
 
   return (
     <section id="works" className="py-24 px-6 md:px-10 max-w-6xl mx-auto">
@@ -238,7 +172,7 @@ export function Projects() {
         transition={{ duration: 0.7, ease: easing }}
       >
         <MotionLink
-          href={featured.href}
+          href={`/portfolio/${featured.slug}`}
           className="group grid grid-cols-1 md:grid-cols-5 rounded-2xl border overflow-hidden"
           style={{ borderColor: "var(--border)", backgroundColor: "var(--bg-secondary)" }}
           whileHover={{ y: -4, transition: { duration: 0.25 } }}
