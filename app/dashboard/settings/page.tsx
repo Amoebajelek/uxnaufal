@@ -78,7 +78,7 @@ export default function SettingsPage() {
 
   /* load username on mount */
   useEffect(() => {
-    fetch("/api/dashboard/password")
+    fetch("/api/admin/password")
       .then((r) => r.json())
       .then((d) => {
         const u = d.username ?? "admin";
@@ -111,7 +111,7 @@ export default function SettingsPage() {
 
     setSaving(true);
     try {
-      const res = await fetch("/api/dashboard/password", {
+      const res = await fetch("/api/admin/password", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -139,7 +139,7 @@ export default function SettingsPage() {
 
       /* logout → login after 2s */
       setTimeout(async () => {
-        await fetch("/api/dashboard/auth", { method: "DELETE" });
+        await fetch("/api/admin/auth", { method: "DELETE" });
         router.push("/dashboard/login");
       }, 2000);
 

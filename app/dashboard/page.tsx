@@ -82,7 +82,7 @@ export default function AdminDashboard() {
   async function loadAnalytics() {
     setLoadingA(true);
     try {
-      const r = await fetch("/api/dashboard/analytics");
+      const r = await fetch("/api/admin/analytics");
       if (r.ok) setAnalytics(await r.json());
     } finally { setLoadingA(false); }
   }
@@ -90,7 +90,7 @@ export default function AdminDashboard() {
   async function loadProjects() {
     setLoadingP(true);
     try {
-      const r = await fetch("/api/dashboard/projects");
+      const r = await fetch("/api/admin/projects");
       if (r.ok) setProjects(await r.json());
     } finally { setLoadingP(false); }
   }
@@ -106,7 +106,7 @@ export default function AdminDashboard() {
   async function handleDelete(id: string, title: string) {
     if (!confirm(`Hapus "${title}"? Tindakan ini tidak dapat dibatalkan.`)) return;
     setDeleting(id);
-    await fetch(`/api/dashboard/projects/${id}`, { method: "DELETE" });
+    await fetch(`/api/admin/projects/${id}`, { method: "DELETE" });
     await loadProjects();
     setDeleting(null);
   }

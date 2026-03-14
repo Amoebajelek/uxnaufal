@@ -11,7 +11,7 @@ export default function AdminPortfolioList() {
   const [deleting, setDeleting] = useState<string | null>(null);
 
   async function load() {
-    const res = await fetch("/api/dashboard/projects");
+    const res = await fetch("/api/admin/projects");
     const data = await res.json();
     setProjects(data);
     setLoading(false);
@@ -22,7 +22,7 @@ export default function AdminPortfolioList() {
   async function handleDelete(id: string, title: string) {
     if (!confirm(`Hapus "${title}"? Tindakan ini tidak dapat dibatalkan.`)) return;
     setDeleting(id);
-    await fetch(`/api/dashboard/projects/${id}`, { method: "DELETE" });
+    await fetch(`/api/admin/projects/${id}`, { method: "DELETE" });
     await load();
     setDeleting(null);
   }
