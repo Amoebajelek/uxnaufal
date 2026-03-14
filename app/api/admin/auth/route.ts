@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
+import { readAdminConfig } from "@/lib/admin-config.server";
 
-const ADMIN_USER = "admin";
-const ADMIN_PASS = "admin";
 const COOKIE_NAME = "uxnaufal_admin";
 const COOKIE_VALUE = "authenticated";
 
@@ -9,7 +8,8 @@ const COOKIE_VALUE = "authenticated";
 export async function POST(request: Request) {
   try {
     const { username, password } = await request.json();
-    if (username === ADMIN_USER && password === ADMIN_PASS) {
+    const config = readAdminConfig();
+    if (username === config.username && password === config.password) {
       const res = NextResponse.json({ success: true });
       res.cookies.set(COOKIE_NAME, COOKIE_VALUE, {
         httpOnly: true,

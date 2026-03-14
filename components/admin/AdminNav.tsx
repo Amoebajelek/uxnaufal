@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, FolderOpen, LogOut } from "lucide-react";
+import { LayoutDashboard, FolderOpen, Settings, LogOut } from "lucide-react";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/admin/portfolio", label: "Portofolio", icon: FolderOpen, exact: false },
+  { href: "/admin/settings", label: "Pengaturan", icon: Settings, exact: false },
 ];
 
 export function AdminNav() {
