@@ -14,7 +14,7 @@ export default async function Home() {
   const projects = await readAllProjects();
 
   return (
-    <main>
+    <main className="overflow-x-hidden w-full">
       <Navbar />
       <Hero />
       <SocialStrip />

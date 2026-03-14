@@ -16,7 +16,7 @@ const items = [...socials, ...socials];
 export function SocialStrip() {
   return (
     <div
-      className="border-t border-b overflow-hidden"
+      className="border-t border-b overflow-hidden w-full"
       style={{
         borderColor: "var(--border)",
         backgroundColor: "var(--bg-secondary)",
