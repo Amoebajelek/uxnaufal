@@ -1,6 +1,13 @@
 /**
- * Server-only: persists admin credentials to data/admin-config.json
- * Falls back to hardcoded defaults (admin/admin) on first run.
+ * Server-only: persists admin credentials.
+ *
+ * Storage strategy:
+ *  - Local / writable FS  → data/admin-config.json
+ *  - Vercel / read-only FS → /tmp/uxnaufal-admin-config.json
+ *
+ * NOTE: /tmp on Vercel is ephemeral — it is wiped on cold-start / redeploy.
+ * After a redeploy the password resets to the hardcoded default ("admin/admin").
+ * For permanent credential storage a database (e.g. Vercel KV) would be needed.
  */
 
 import fs from "fs";
@@ -13,32 +20,44 @@ export interface AdminConfig {
 
 const DEFAULT_CONFIG: AdminConfig = { username: "admin", password: "admin" };
 
-// Always use the local data/ directory (committed with .gitkeep)
-const CONFIG_PATH = path.join(process.cwd(), "data", "admin-config.json");
+const LOCAL_PATH = path.join(process.cwd(), "data", "admin-config.json");
+const TMP_PATH   = "/tmp/uxnaufal-admin-config.json";
 
-function ensureDir() {
-  const dir = path.dirname(CONFIG_PATH);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
+/** Returns a writable file path for the config. */
+function getWritablePath(): string {
+  try {
+    const dir = path.dirname(LOCAL_PATH);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.accessSync(dir, fs.constants.W_OK);
+    return LOCAL_PATH;
+  } catch {
+    return TMP_PATH;
   }
 }
 
 export function readAdminConfig(): AdminConfig {
-  try {
-    ensureDir();
-    if (fs.existsSync(CONFIG_PATH)) {
-      const raw = fs.readFileSync(CONFIG_PATH, "utf-8");
-      const parsed = JSON.parse(raw) as AdminConfig;
-      // Validate shape
-      if (parsed.username && parsed.password) return parsed;
+  // On Vercel the writable path is /tmp; check that first, then LOCAL_PATH.
+  const writablePath = getWritablePath();
+  const candidates = writablePath === LOCAL_PATH
+    ? [LOCAL_PATH]
+    : [TMP_PATH, LOCAL_PATH];
+
+  for (const filePath of candidates) {
+    try {
+      if (fs.existsSync(filePath)) {
+        const parsed = JSON.parse(fs.readFileSync(filePath, "utf-8")) as AdminConfig;
+        if (parsed.username && parsed.password) return parsed;
+      }
+    } catch {
+      // try next candidate
     }
-  } catch (e) {
-    console.error("[admin-config] read error:", e);
   }
   return { ...DEFAULT_CONFIG };
 }
 
 export function writeAdminConfig(config: AdminConfig): void {
-  ensureDir();
-  fs.writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2), "utf-8");
+  const filePath = getWritablePath();
+  const dir = path.dirname(filePath);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(filePath, JSON.stringify(config, null, 2), "utf-8");
 }
