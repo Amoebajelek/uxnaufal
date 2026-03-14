@@ -35,8 +35,10 @@ export async function PUT(request: Request) {
     });
 
     return NextResponse.json({ success: true });
-  } catch {
-    return NextResponse.json({ error: "Bad request" }, { status: 400 });
+  } catch (e) {
+    console.error("[password] PUT error:", e);
+    const msg = e instanceof Error ? e.message : "Internal server error";
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
 
