@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { readAdminConfig } from "@/lib/admin-config.server";
 
+export const dynamic = "force-dynamic";
+
 const COOKIE_NAME = "uxnaufal_admin";
 const COOKIE_VALUE = "authenticated";
 

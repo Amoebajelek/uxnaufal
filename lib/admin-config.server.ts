@@ -1,43 +1,44 @@
 /**
  * Server-only: persists admin credentials to data/admin-config.json
- * Falls back to env vars or hardcoded defaults on first run.
+ * Falls back to hardcoded defaults (admin/admin) on first run.
  */
 
 import fs from "fs";
 import path from "path";
 
-interface AdminConfig {
+export interface AdminConfig {
   username: string;
   password: string;
 }
 
 const DEFAULT_CONFIG: AdminConfig = { username: "admin", password: "admin" };
 
-function getConfigPath(): string {
-  const localPath = path.join(process.cwd(), "data", "admin-config.json");
-  try {
-    const dir = path.dirname(localPath);
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    fs.accessSync(dir, fs.constants.W_OK);
-    return localPath;
-  } catch {
-    return "/tmp/uxnaufal-admin-config.json";
+// Always use the local data/ directory (committed with .gitkeep)
+const CONFIG_PATH = path.join(process.cwd(), "data", "admin-config.json");
+
+function ensureDir() {
+  const dir = path.dirname(CONFIG_PATH);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
   }
 }
 
 export function readAdminConfig(): AdminConfig {
   try {
-    const p = getConfigPath();
-    if (fs.existsSync(p)) {
-      return JSON.parse(fs.readFileSync(p, "utf-8")) as AdminConfig;
+    ensureDir();
+    if (fs.existsSync(CONFIG_PATH)) {
+      const raw = fs.readFileSync(CONFIG_PATH, "utf-8");
+      const parsed = JSON.parse(raw) as AdminConfig;
+      // Validate shape
+      if (parsed.username && parsed.password) return parsed;
     }
-  } catch {}
-  return DEFAULT_CONFIG;
+  } catch (e) {
+    console.error("[admin-config] read error:", e);
+  }
+  return { ...DEFAULT_CONFIG };
 }
 
 export function writeAdminConfig(config: AdminConfig): void {
-  const p = getConfigPath();
-  const dir = path.dirname(p);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(p, JSON.stringify(config, null, 2), "utf-8");
+  ensureDir();
+  fs.writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2), "utf-8");
 }

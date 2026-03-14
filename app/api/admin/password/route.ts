@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { readAdminConfig, writeAdminConfig } from "@/lib/admin-config.server";
 
+export const dynamic = "force-dynamic";
+
 // PUT /api/admin/password  → change password (and optionally username)
 export async function PUT(request: Request) {
   try {
