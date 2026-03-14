@@ -5,20 +5,39 @@ import { LanguageProvider } from "@/components/LanguageContext";
 import { PageTracker } from "@/components/PageTracker";
 import "./globals.css";
 
+const BASE_URL = "https://uxnaufal.vercel.app";
+
 export const metadata: Metadata = {
-  title: "Naufal Abdussyakur — UI/UX Designer",
+  metadataBase: new URL(BASE_URL),
+  title: {
+    default: "Naufal Abdussyakur — UI/UX Designer",
+    template: "%s — uxnaufal",
+  },
   description:
     "UI/UX Designer with 3+ years crafting digital products that are useful and enjoyable. Based in Bandung, Indonesia.",
-  keywords: ["UI/UX Designer", "UX Design", "Product Design", "Bandung"],
-  authors: [{ name: "Naufal Abdussyakur" }],
+  keywords: [
+    "UI/UX Designer", "UX Design", "Product Design", "Interaction Design",
+    "Figma", "User Research", "Bandung", "Indonesia", "Naufal Abdussyakur",
+  ],
+  authors: [{ name: "Naufal Abdussyakur", url: BASE_URL }],
+  creator: "Naufal Abdussyakur",
+  robots: { index: true, follow: true },
+  alternates: { canonical: BASE_URL },
   openGraph: {
     title: "Naufal Abdussyakur — UI/UX Designer",
     description:
-      "UI/UX Designer with 3+ years crafting digital products that are useful and enjoyable.",
-    url: "https://uxnaufal.vercel.app",
+      "UI/UX Designer with 3+ years crafting digital products that are useful and enjoyable. Based in Bandung, Indonesia.",
+    url: BASE_URL,
     siteName: "uxnaufal",
     locale: "en_US",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Naufal Abdussyakur — UI/UX Designer",
+    description:
+      "UI/UX Designer with 3+ years crafting digital products that are useful and enjoyable.",
+    creator: "@uxnaufal",
   },
 };
 
