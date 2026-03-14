@@ -1,17 +1,9 @@
 /**
- * Server-only: persists admin credentials.
- *
- * Storage strategy:
- *  - Local / writable FS  → data/admin-config.json
- *  - Vercel / read-only FS → /tmp/uxnaufal-admin-config.json
- *
- * NOTE: /tmp on Vercel is ephemeral — it is wiped on cold-start / redeploy.
- * After a redeploy the password resets to the hardcoded default ("admin/admin").
- * For permanent credential storage a database (e.g. Vercel KV) would be needed.
+ * Server-only: persists admin credentials in Supabase.
+ * Falls back to hardcoded defaults (admin/admin) if DB is unavailable.
  */
 
-import fs from "fs";
-import path from "path";
+import { supabase } from "./supabase.server";
 
 export interface AdminConfig {
   username: string;
@@ -20,44 +12,28 @@ export interface AdminConfig {
 
 const DEFAULT_CONFIG: AdminConfig = { username: "admin", password: "admin" };
 
-const LOCAL_PATH = path.join(process.cwd(), "data", "admin-config.json");
-const TMP_PATH   = "/tmp/uxnaufal-admin-config.json";
-
-/** Returns a writable file path for the config. */
-function getWritablePath(): string {
+export async function readAdminConfig(): Promise<AdminConfig> {
   try {
-    const dir = path.dirname(LOCAL_PATH);
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    fs.accessSync(dir, fs.constants.W_OK);
-    return LOCAL_PATH;
-  } catch {
-    return TMP_PATH;
-  }
-}
+    const { data, error } = await supabase
+      .from("admin_config")
+      .select("username, password")
+      .eq("id", 1)
+      .maybeSingle();
 
-export function readAdminConfig(): AdminConfig {
-  // On Vercel the writable path is /tmp; check that first, then LOCAL_PATH.
-  const writablePath = getWritablePath();
-  const candidates = writablePath === LOCAL_PATH
-    ? [LOCAL_PATH]
-    : [TMP_PATH, LOCAL_PATH];
-
-  for (const filePath of candidates) {
-    try {
-      if (fs.existsSync(filePath)) {
-        const parsed = JSON.parse(fs.readFileSync(filePath, "utf-8")) as AdminConfig;
-        if (parsed.username && parsed.password) return parsed;
-      }
-    } catch {
-      // try next candidate
+    if (error) throw error;
+    if (data && data.username && data.password) {
+      return { username: data.username as string, password: data.password as string };
     }
+  } catch (e) {
+    console.error("[admin-config] read error:", e);
   }
   return { ...DEFAULT_CONFIG };
 }
 
-export function writeAdminConfig(config: AdminConfig): void {
-  const filePath = getWritablePath();
-  const dir = path.dirname(filePath);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(filePath, JSON.stringify(config, null, 2), "utf-8");
+export async function writeAdminConfig(config: AdminConfig): Promise<void> {
+  const { error } = await supabase
+    .from("admin_config")
+    .upsert({ id: 1, username: config.username, password: config.password }, { onConflict: "id" });
+
+  if (error) throw error;
 }

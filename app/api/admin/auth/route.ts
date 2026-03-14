@@ -10,7 +10,7 @@ const COOKIE_VALUE = "authenticated";
 export async function POST(request: Request) {
   try {
     const { username, password } = await request.json();
-    const config = readAdminConfig();
+    const config = await readAdminConfig();
     if (username === config.username && password === config.password) {
       const res = NextResponse.json({ success: true });
       res.cookies.set(COOKIE_NAME, COOKIE_VALUE, {
@@ -23,7 +23,8 @@ export async function POST(request: Request) {
       return res;
     }
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
-  } catch {
+  } catch (e) {
+    console.error("[auth] POST error:", e);
     return NextResponse.json({ error: "Bad request" }, { status: 400 });
   }
 }

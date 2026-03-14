@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import {
-  readAllProjects,
-  writeAllProjects,
+  readOneProject,
+  upsertProject,
   deleteProject,
   seedIfEmpty,
 } from "@/lib/data-store.server";
@@ -11,8 +11,8 @@ export const dynamic = "force-dynamic";
 
 // GET /api/admin/projects/[id]
 export async function GET(_req: Request, { params }: { params: { id: string } }) {
-  seedIfEmpty();
-  const project = readAllProjects().find((p) => p.id === params.id);
+  await seedIfEmpty();
+  const project = await readOneProject(params.id);
   if (!project) return NextResponse.json({ error: "Not found" }, { status: 404 });
   return NextResponse.json(project);
 }
@@ -20,20 +20,20 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
 // PUT /api/admin/projects/[id]  → update
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
   try {
-    seedIfEmpty();
+    await seedIfEmpty();
     const body = (await request.json()) as Project;
-    const all = readAllProjects();
-    const idx = all.findIndex((p) => p.id === params.id);
-    if (idx < 0) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-    // Preserve original id; allow slug changes
-    all[idx] = {
+    const existing = await readOneProject(params.id);
+    if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+    const updated: Project = {
       ...body,
-      id: params.id,
+      id:   params.id,
       slug: body.slug || params.id,
     };
-    writeAllProjects(all);
-    return NextResponse.json(all[idx]);
+
+    await upsertProject(updated);
+    return NextResponse.json(updated);
   } catch (e) {
     console.error("[projects] PUT error:", e);
     const msg = e instanceof Error ? e.message : "Internal server error";
@@ -43,8 +43,8 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 
 // DELETE /api/admin/projects/[id]
 export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
-  seedIfEmpty();
-  const ok = deleteProject(params.id);
+  await seedIfEmpty();
+  const ok = await deleteProject(params.id);
   if (!ok) return NextResponse.json({ error: "Not found" }, { status: 404 });
   return NextResponse.json({ success: true });
 }

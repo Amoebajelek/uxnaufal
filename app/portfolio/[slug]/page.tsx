@@ -6,7 +6,7 @@ import { PortfolioDetail } from "@/components/PortfolioDetail";
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const projects = readAllProjects();
+  const projects = await readAllProjects();
   const project = projects.find((p) => p.slug === params.slug);
   if (!project) return {};
   return {
@@ -15,8 +15,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default function ProjectPage({ params }: { params: { slug: string } }) {
-  const projects = readAllProjects();
+export default async function ProjectPage({ params }: { params: { slug: string } }) {
+  const projects = await readAllProjects();
   const project = projects.find((p) => p.slug === params.slug);
   if (!project) notFound();
   return <PortfolioDetail project={project} />;

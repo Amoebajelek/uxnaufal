@@ -5,14 +5,14 @@ import { ProjectForm } from "@/components/admin/ProjectForm";
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
-  seedIfEmpty();
-  const project = readOneProject(params.id);
+  await seedIfEmpty();
+  const project = await readOneProject(params.id);
   return { title: project ? `Edit ${project.title} — Admin` : "Edit Proyek" };
 }
 
-export default function EditProjectPage({ params }: { params: { id: string } }) {
-  seedIfEmpty();
-  const project = readOneProject(params.id);
+export default async function EditProjectPage({ params }: { params: { id: string } }) {
+  await seedIfEmpty();
+  const project = await readOneProject(params.id);
   if (!project) notFound();
   return <ProjectForm mode="edit" initial={project} />;
 }
