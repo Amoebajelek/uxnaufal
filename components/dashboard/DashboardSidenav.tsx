@@ -52,7 +52,7 @@ export function DashboardSidenav() {
       <div className="px-5 py-5 flex items-center justify-between">
         <Link href="/dashboard" className="font-display font-extrabold text-lg tracking-tight" style={{ color: "var(--text-primary)" }}>
           ux<span style={{ color: "var(--accent)" }}>naufal</span>
-          <span className="ml-2 text-xs font-normal opacity-40">cms</span>
+          <span className="ml-2 text-xs font-normal opacity-40">dashboard</span>
         </Link>
         {/* Close button (mobile only) */}
         <button
@@ -173,7 +173,7 @@ export function DashboardSidenav() {
       >
         <Link href="/dashboard" className="font-display font-extrabold text-base tracking-tight" style={{ color: "var(--text-primary)" }}>
           ux<span style={{ color: "var(--accent)" }}>naufal</span>
-          <span className="ml-2 text-xs font-normal opacity-40">cms</span>
+          <span className="ml-2 text-xs font-normal opacity-40">dashboard</span>
         </Link>
 
         <div className="flex items-center gap-2">
