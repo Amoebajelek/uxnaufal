@@ -6,6 +6,7 @@ import {
   Plus, Trash2, ChevronDown, ChevronUp, Save, ArrowLeft, GripVertical,
 } from "lucide-react";
 import type { Project, ProjectSection, SectionType } from "@/lib/projects";
+import { useLang } from "@/components/LanguageContext";
 
 /* ─── Helpers ─── */
 function slug(s: string) {
@@ -16,17 +17,6 @@ const SECTION_TYPES: SectionType[] = [
   "nutshell", "context", "problem-discovery", "problem",
   "solution", "finaldesign", "reflection", "notion-only",
 ];
-
-const SECTION_LABELS: Record<SectionType, string> = {
-  nutshell: "In a Nutshell",
-  context: "Context",
-  "problem-discovery": "Problem Discovery",
-  problem: "Problem",
-  solution: "Solution",
-  finaldesign: "Final Design",
-  reflection: "Reflection",
-  "notion-only": "Notion Only",
-};
 
 /* ─── Field helpers ─── */
 function Field({
@@ -102,25 +92,21 @@ function SectionEditor({
   onDelete: () => void;
   onMove: (dir: -1 | 1) => void;
 }) {
+  const { t } = useLang();
   const [open, setOpen] = useState(true);
 
   function set<K extends keyof ProjectSection>(key: K, value: ProjectSection[K]) {
     onChange({ ...section, [key]: value });
   }
 
-  // boldList helpers
-  const boldList = section.boldList ?? [];
+  const boldList    = section.boldList ?? [];
   const setBoldList = (list: typeof boldList) => set("boldList", list);
-
-  // items helpers (finaldesign)
-  const items = section.items ?? [];
-  const setItems = (arr: typeof items) => set("items", arr);
-
-  // learnings
-  const learnings = section.learnings ?? [];
-
-  // collaborators
+  const items       = section.items ?? [];
+  const setItems    = (arr: typeof items) => set("items", arr);
+  const learnings    = section.learnings ?? [];
   const collaborators = section.collaborators ?? [];
+
+  const sectionTypeLabel = (type: SectionType) => t(`form.stype.${type}`);
 
   return (
     <div
@@ -138,10 +124,10 @@ function SectionEditor({
           className="text-xs px-2 py-0.5 rounded-full font-medium"
           style={{ backgroundColor: "var(--accent-bg)", color: "var(--accent)", border: "1px solid var(--accent-border)" }}
         >
-          {SECTION_LABELS[section.type]}
+          {sectionTypeLabel(section.type)}
         </span>
         <span className="text-sm flex-1 truncate" style={{ color: "var(--text-primary)" }}>
-          {section.label || section.heading || "Tanpa judul"}
+          {section.label || section.heading || t("form.untitled")}
         </span>
         <div className="flex items-center gap-1 ml-auto" onClick={(e) => e.stopPropagation()}>
           <button
@@ -181,16 +167,16 @@ function SectionEditor({
       {/* Body */}
       {open && (
         <div className="p-5 flex flex-col gap-4">
-          {/* Type */}
+          {/* Type + Label */}
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Tipe Section">
+            <Field label={t("form.section.type")}>
               <Select
                 value={section.type}
                 onChange={(v) => set("type", v as SectionType)}
-                options={SECTION_TYPES.map((t) => ({ value: t, label: SECTION_LABELS[t] }))}
+                options={SECTION_TYPES.map((st) => ({ value: st, label: sectionTypeLabel(st) }))}
               />
             </Field>
-            <Field label="Label (sidebar nav)">
+            <Field label={t("form.field.label.nav")}>
               <Input
                 value={section.label ?? ""}
                 onChange={(v) => set("label", v || undefined)}
@@ -199,7 +185,7 @@ function SectionEditor({
             </Field>
           </div>
 
-          <Field label="Heading">
+          <Field label={t("form.field.heading")}>
             <Input
               value={section.heading}
               onChange={(v) => set("heading", v)}
@@ -207,18 +193,18 @@ function SectionEditor({
             />
           </Field>
 
-          <Field label="Konten / Body Text">
+          <Field label={t("form.section.content")}>
             <Textarea
               value={section.content ?? ""}
               onChange={(v) => set("content", v || undefined)}
-              placeholder="Teks isi section..."
+              placeholder={t("form.ph.section.content")}
               rows={4}
             />
           </Field>
 
           {/* Image (for context, problem, etc.) */}
           {["context", "problem", "problem-discovery"].includes(section.type) && (
-            <Field label="Gambar (path)" hint="Contoh: /Aitiserve_Context.jpg">
+            <Field label={t("form.section.image")} hint={t("form.section.image.hint")}>
               <Input
                 value={section.image ?? ""}
                 onChange={(v) => set("image", v || undefined)}
@@ -229,7 +215,7 @@ function SectionEditor({
 
           {/* boldList for context */}
           {section.type === "context" && (
-            <Field label="Bold List (Context)">
+            <Field label={t("form.section.boldlist")}>
               <div className="flex flex-col gap-2">
                 {boldList.map((item, i) => (
                   <div key={i} className="flex gap-2 items-start">
@@ -251,7 +237,7 @@ function SectionEditor({
                         next[i] = { ...next[i], desc: e.target.value };
                         setBoldList(next);
                       }}
-                      placeholder="Deskripsi"
+                      placeholder={t("form.ph.desc.item")}
                       className="flex-1 px-3 py-2 rounded-lg text-xs outline-none"
                       style={{ backgroundColor: "var(--bg)", border: "1px solid var(--border)", color: "var(--text-primary)" }}
                     />
@@ -265,7 +251,7 @@ function SectionEditor({
                   className="inline-flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg self-start border"
                   style={{ borderColor: "var(--border-strong)", color: "var(--text-muted)" }}
                 >
-                  <Plus size={11} /> Tambah Item
+                  <Plus size={11} /> {t("form.section.add.item")}
                 </button>
               </div>
             </Field>
@@ -273,7 +259,7 @@ function SectionEditor({
 
           {/* items for finaldesign */}
           {section.type === "finaldesign" && (
-            <Field label="Design Items (label + gambar)">
+            <Field label={t("form.section.design.items")}>
               <div className="flex flex-col gap-2">
                 {items.map((item, i) => (
                   <div key={i} className="flex gap-2 items-center">
@@ -309,7 +295,7 @@ function SectionEditor({
                   className="inline-flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg self-start border"
                   style={{ borderColor: "var(--border-strong)", color: "var(--text-muted)" }}
                 >
-                  <Plus size={11} /> Tambah Gambar
+                  <Plus size={11} /> {t("form.section.add.image")}
                 </button>
               </div>
             </Field>
@@ -318,15 +304,15 @@ function SectionEditor({
           {/* learnings & collaborators for reflection */}
           {section.type === "reflection" && (
             <>
-              <Field label="Learnings (satu per baris)">
+              <Field label={t("form.section.learnings")}>
                 <Textarea
                   value={learnings.join("\n")}
                   onChange={(v) => set("learnings", v ? v.split("\n").filter(Boolean) : undefined)}
-                  placeholder="Satu poin per baris..."
+                  placeholder={t("form.ph.learnings")}
                   rows={3}
                 />
               </Field>
-              <Field label="Collaborators (satu per baris)">
+              <Field label={t("form.section.collabs")}>
                 <Textarea
                   value={collaborators.join("\n")}
                   onChange={(v) => set("collaborators", v ? v.split("\n").filter(Boolean) : undefined)}
@@ -351,10 +337,10 @@ export function ProjectForm({
   mode: "new" | "edit";
 }) {
   const router = useRouter();
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
+  const { t }  = useLang();
+  const [saving,  setSaving]  = useState(false);
+  const [error,   setError]   = useState("");
   const [success, setSuccess] = useState(false);
-  // Track whether user has manually edited the ID field (to stop auto-generating from title)
   const idTouched = useRef(mode === "edit");
 
   const empty: Project = {
@@ -403,17 +389,14 @@ export function ProjectForm({
     setError("");
     setSuccess(false);
 
-    // Auto-fill slug from id
     const payload: Project = {
       ...form,
-      id: form.id || slug(form.title),
+      id:   form.id   || slug(form.title),
       slug: form.slug || slug(form.title),
     };
 
     try {
-      const url = mode === "edit"
-        ? `/api/admin/projects/${initial!.id}`
-        : "/api/admin/projects";
+      const url    = mode === "edit" ? `/api/admin/projects/${initial!.id}` : "/api/admin/projects";
       const method = mode === "edit" ? "PUT" : "POST";
 
       const res = await fetch(url, {
@@ -424,15 +407,13 @@ export function ProjectForm({
 
       if (!res.ok) {
         const err = await res.json();
-        setError(err.error ?? "Terjadi kesalahan saat menyimpan.");
+        setError(err.error ?? t("form.err.save"));
       } else {
         setSuccess(true);
-        if (mode === "new") {
-          router.push(`/dashboard/portfolio/${payload.id}`);
-        }
+        if (mode === "new") router.push(`/dashboard/portfolio/${payload.id}`);
       }
     } catch {
-      setError("Koneksi gagal. Coba lagi.");
+      setError(t("form.err.network"));
     }
     setSaving(false);
   }
@@ -451,17 +432,17 @@ export function ProjectForm({
           </button>
           <div>
             <h1 className="font-display font-extrabold text-2xl tracking-tight" style={{ color: "var(--text-primary)" }}>
-              {mode === "new" ? "Tambah Proyek Baru" : `Edit: ${initial?.title ?? ""}`}
+              {mode === "new" ? t("form.add.title") : `${t("form.edit.prefix")} ${initial?.title ?? ""}`}
             </h1>
             <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
-              {mode === "new" ? "Isi semua field lalu simpan" : `ID: ${initial?.id}`}
+              {mode === "new" ? t("form.add.hint") : `ID: ${initial?.id}`}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-3">
           {success && (
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium" style={{ color: "#22c55e" }}>✓ Tersimpan</span>
+              <span className="text-xs font-medium" style={{ color: "#22c55e" }}>{t("form.saved")}</span>
               <a
                 href={`/portfolio/${form.slug || form.id}`}
                 target="_blank"
@@ -469,7 +450,7 @@ export function ProjectForm({
                 className="text-xs underline hover:opacity-70 transition-opacity"
                 style={{ color: "var(--accent)" }}
               >
-                Lihat →
+                {t("form.view")}
               </a>
             </div>
           )}
@@ -483,37 +464,40 @@ export function ProjectForm({
             style={{ backgroundColor: "var(--accent)", color: "#0a0a0a" }}
           >
             <Save size={14} />
-            {saving ? "Menyimpan…" : "Simpan"}
+            {saving ? t("form.saving") : t("form.save")}
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left: Basic info */}
+        {/* Left: Basic info + Sections */}
         <div className="lg:col-span-2 flex flex-col gap-5">
-          {/* Card: Identitas */}
-          <FormCard title="Identitas Proyek">
+
+          {/* Card: Identity */}
+          <FormCard title={t("form.card.identity")}>
             <div className="grid grid-cols-2 gap-4">
-              <Field label="ID (slug unik)" hint={mode === "new" ? "Auto-generate dari judul" : "Tidak bisa diubah setelah disimpan"}>
+              <Field
+                label={t("form.field.id")}
+                hint={mode === "new" ? t("form.field.id.hint.new") : t("form.field.id.hint.edit")}
+              >
                 <Input
                   value={form.id}
                   onChange={(v) => {
                     idTouched.current = true;
-                    setField("id", v);
+                    setField("id",   v);
                     setField("slug", v);
                   }}
                   placeholder="aitiserve"
                 />
               </Field>
-              <Field label="Tipe">
+              <Field label={t("form.field.type")}>
                 <Input value={form.type} onChange={(v) => setField("type", v)} placeholder="Redesign" />
               </Field>
             </div>
-            <Field label="Judul">
+            <Field label={t("form.field.title")}>
               <Input
                 value={form.title}
                 onChange={(v) => {
-                  // In new mode, keep syncing id+slug from title until user manually edits ID
                   if (mode === "new" && !idTouched.current) {
                     const generated = slug(v);
                     setForm((f) => ({ ...f, title: v, id: generated, slug: generated }));
@@ -521,40 +505,43 @@ export function ProjectForm({
                     setField("title", v);
                   }
                 }}
-                placeholder="Judul proyek..."
+                placeholder={t("form.ph.title")}
               />
             </Field>
-            <Field label="Deskripsi Singkat">
+            <Field label={t("form.field.desc")}>
               <Textarea
                 value={form.description}
                 onChange={(v) => setField("description", v)}
-                placeholder="Deskripsi singkat proyek..."
+                placeholder={t("form.ph.desc")}
                 rows={3}
               />
             </Field>
           </FormCard>
 
           {/* Card: Sections */}
-          <FormCard title="Sections" action={
-            <button
-              onClick={addSection}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border"
-              style={{ borderColor: "var(--border-strong)", color: "var(--text-muted)" }}
-            >
-              <Plus size={11} /> Tambah Section
-            </button>
-          }>
+          <FormCard
+            title={t("form.card.sections")}
+            action={
+              <button
+                onClick={addSection}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border"
+                style={{ borderColor: "var(--border-strong)", color: "var(--text-muted)" }}
+              >
+                <Plus size={11} /> {t("form.section.add")}
+              </button>
+            }
+          >
             {form.sections.length === 0 ? (
               <div className="py-8 text-center">
                 <p className="text-sm mb-3" style={{ color: "var(--text-muted)" }}>
-                  Belum ada section. Tambah section pertama.
+                  {t("form.section.empty")}
                 </p>
                 <button
                   onClick={addSection}
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium border"
                   style={{ borderColor: "var(--border-strong)", color: "var(--text-muted)" }}
                 >
-                  <Plus size={13} /> Tambah Section
+                  <Plus size={13} /> {t("form.section.add")}
                 </button>
               </div>
             ) : (
@@ -577,40 +564,41 @@ export function ProjectForm({
 
         {/* Right: metadata */}
         <div className="flex flex-col gap-5">
-          <FormCard title="Detail Proyek">
-            <Field label="Tahun">
+
+          <FormCard title={t("form.card.details")}>
+            <Field label={t("form.field.year")}>
               <Input value={form.year} onChange={(v) => setField("year", v)} placeholder="2024" />
             </Field>
-            <Field label="Durasi">
+            <Field label={t("form.field.duration")}>
               <Input value={form.duration} onChange={(v) => setField("duration", v)} placeholder="Juni 2024 · 3 Minggu" />
             </Field>
-            <Field label="Role">
+            <Field label={t("form.field.role")}>
               <Input value={form.role ?? ""} onChange={(v) => setField("role", v)} placeholder="Lead UI/UX Designer" />
             </Field>
-            <Field label="Klien">
+            <Field label={t("form.field.client")}>
               <Input value={form.client ?? ""} onChange={(v) => setField("client", v)} placeholder="Nama klien" />
             </Field>
           </FormCard>
 
-          <FormCard title="Tags & Skills">
-            <Field label="Tags" hint="Pisahkan dengan koma">
+          <FormCard title={t("form.card.tags")}>
+            <Field label={t("form.field.tags")} hint={t("form.field.comma.hint")}>
               <Input
                 value={form.tags.join(", ")}
-                onChange={(v) => setField("tags", v.split(",").map((t) => t.trim()).filter(Boolean))}
+                onChange={(v) => setField("tags", v.split(",").map((s) => s.trim()).filter(Boolean))}
                 placeholder="UX Research, UI Design"
               />
             </Field>
-            <Field label="Skills" hint="Pisahkan dengan koma">
+            <Field label={t("form.field.skills")} hint={t("form.field.comma.hint")}>
               <Input
                 value={(form.skills ?? []).join(", ")}
-                onChange={(v) => setField("skills", v.split(",").map((t) => t.trim()).filter(Boolean))}
+                onChange={(v) => setField("skills", v.split(",").map((s) => s.trim()).filter(Boolean))}
                 placeholder="Design Thinking, Figma"
               />
             </Field>
           </FormCard>
 
-          <FormCard title="Visual & Links">
-            <Field label="Warna Latar (hex)">
+          <FormCard title={t("form.card.visual")}>
+            <Field label={t("form.field.bg.color")}>
               <div className="flex gap-2">
                 <Input value={form.color} onChange={(v) => setField("color", v)} placeholder="#1a1a1a" />
                 <input
@@ -622,7 +610,7 @@ export function ProjectForm({
                 />
               </div>
             </Field>
-            <Field label="Warna Aksen (hex)">
+            <Field label={t("form.field.accent.color")}>
               <div className="flex gap-2">
                 <Input value={form.accent} onChange={(v) => setField("accent", v)} placeholder="#c8ff57" />
                 <input
@@ -634,13 +622,13 @@ export function ProjectForm({
                 />
               </div>
             </Field>
-            <Field label="Thumbnail" hint="Path dari /public">
+            <Field label={t("form.field.thumbnail")} hint={t("form.field.thumbnail.hint")}>
               <Input value={form.thumbnail ?? ""} onChange={(v) => setField("thumbnail", v)} placeholder="/Thumbnail_Aitiserve.jpg" />
             </Field>
-            <Field label="Live URL">
+            <Field label={t("form.field.liveurl")}>
               <Input value={form.liveUrl ?? ""} onChange={(v) => setField("liveUrl", v)} placeholder="https://..." />
             </Field>
-            <Field label="External Link (Notion)">
+            <Field label={t("form.field.external")}>
               <Input value={form.externalHref ?? ""} onChange={(v) => setField("externalHref", v)} placeholder="https://notion.so/..." />
             </Field>
           </FormCard>

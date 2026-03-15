@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { ArrowLeft, ArrowUpRight, Calendar, Clock, User, Building2 } from "lucide-react";
 import { motion } from "framer-motion";
 import type { Project, ProjectSection } from "@/lib/projects";
+import { useLang } from "@/components/LanguageContext";
+import { LangToggle } from "@/components/LangToggle";
 
 /* ─── Convert label → DOM id ─── */
 function labelToId(label: string): string {
@@ -72,6 +74,7 @@ function NutshellSection({ section, accent }: { section: ProjectSection; accent:
 
 /* ─── Context with image + definition list ─── */
 function ContextSection({ section, accent }: { section: ProjectSection; accent: string }) {
+  const { t } = useLang();
   return (
     <motion.div {...fadeUp(0)}>
       <SectionLabel label={section.label} accent={accent} />
@@ -100,7 +103,7 @@ function ContextSection({ section, accent }: { section: ProjectSection; accent: 
       {section.boldList && (
         <div className="mt-4">
           <p className="text-base mb-3" style={{ color: "var(--text-secondary)" }}>
-            The main product flow includes:
+            {t("portfolio.context.flow")}
           </p>
           <ol className="list-decimal ml-6 space-y-2">
             {section.boldList.map((item, i) => (
@@ -139,6 +142,7 @@ function ProblemDiscoverySection({ section, accent }: { section: ProjectSection;
 
 /* ─── Problem (numbered, with optional image) ─── */
 function ProblemSection({ section, accent }: { section: ProjectSection; accent: string }) {
+  const { t } = useLang();
   return (
     <motion.div {...fadeUp(0)}>
       <div
@@ -152,7 +156,7 @@ function ProblemSection({ section, accent }: { section: ProjectSection; accent: 
 
       {section.image && (
         <div className="mt-4">
-          <p className="text-sm font-semibold mb-3" style={{ color: "var(--text-primary)" }}>Preview</p>
+          <p className="text-sm font-semibold mb-3" style={{ color: "var(--text-primary)" }}>{t("portfolio.problem.preview")}</p>
           <motion.div
             className="w-full rounded-xl overflow-hidden"
             style={{ backgroundColor: "var(--bg-secondary)" }}
@@ -236,6 +240,7 @@ function FinalDesignSection({ section, accent }: { section: ProjectSection; acce
 
 /* ─── Reflection ─── */
 function ReflectionSection({ section, accent }: { section: ProjectSection; accent: string }) {
+  const { t } = useLang();
   return (
     <motion.div {...fadeUp(0)}>
       <SectionLabel label={section.label} accent={accent} />
@@ -265,10 +270,10 @@ function ReflectionSection({ section, accent }: { section: ProjectSection; accen
       {section.collaborators && section.collaborators.length > 0 && (
         <div className="mt-4">
           <p className="text-base font-semibold mb-3" style={{ color: "var(--text-primary)" }}>
-            Shoutout to all collaborators
+            {t("portfolio.reflection.collabTitle")}
           </p>
           <p className="text-base mb-2" style={{ color: "var(--text-secondary)" }}>
-            Huge shoutout to everyone I collaborated with during this project
+            {t("portfolio.reflection.collabDesc")}
           </p>
           <ul className="list-disc ml-6 space-y-1">
             {section.collaborators.map((c, i) => (
@@ -285,6 +290,7 @@ function ReflectionSection({ section, accent }: { section: ProjectSection; accen
 
 /* ─── Notion-only placeholder ─── */
 function NotionOnlySection({ section, accent, externalHref }: { section: ProjectSection; accent: string; externalHref?: string }) {
+  const { t } = useLang();
   return (
     <motion.div
       className="flex flex-col items-center text-center py-16 px-8 rounded-2xl border"
@@ -317,7 +323,7 @@ function NotionOnlySection({ section, accent, externalHref }: { section: Project
           className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full text-sm font-semibold transition-all hover:opacity-85 active:scale-95"
           style={{ backgroundColor: accent, color: "#0a0a0a" }}
         >
-          Read Full Case Study
+          {t("portfolio.notion.button")}
           <ArrowUpRight size={15} />
         </a>
       )}
@@ -357,14 +363,51 @@ function RenderSection({
   }
 }
 
-/* ─── Sidebar nav ─── */
-function SidebarNav({ sections, accent }: { sections: ProjectSection[]; accent: string }) {
-  const labels = sections.map((s) => s.label).filter(Boolean) as string[];
-  const [activeId, setActiveId] = useState<string>("");
+/* ─── Reading progress bar (top of viewport) ─── */
+function ReadingProgress({ accent }: { accent: string }) {
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    if (labels.length < 3) return;
+    const update = () => {
+      const scrollTop    = window.scrollY;
+      const docHeight    = document.documentElement.scrollHeight - window.innerHeight;
+      setProgress(docHeight > 0 ? Math.min(100, (scrollTop / docHeight) * 100) : 0);
+    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
+  }, []);
 
+  return (
+    <div
+      className="fixed top-0 left-0 z-[60] h-[3px] transition-all duration-75"
+      style={{ width: `${progress}%`, backgroundColor: accent }}
+    />
+  );
+}
+
+/* ─── Sidebar nav ─── */
+function SidebarNav({ sections, accent }: { sections: ProjectSection[]; accent: string }) {
+  const { t }   = useLang();
+  const labels  = sections.map((s) => s.label).filter(Boolean) as string[];
+  const [activeId, setActiveId]     = useState<string>("");
+  const [readProgress, setReadProgress] = useState(0);
+
+  /* scroll progress */
+  useEffect(() => {
+    const update = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      setReadProgress(docHeight > 0 ? Math.min(100, (scrollTop / docHeight) * 100) : 0);
+    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
+  }, []);
+
+  /* active section observer */
+  useEffect(() => {
+    if (labels.length < 3) return;
     const ids = labels.map(labelToId);
     const observers: IntersectionObserver[] = [];
 
@@ -372,10 +415,8 @@ function SidebarNav({ sections, accent }: { sections: ProjectSection[]; accent: 
       const el = document.getElementById(id);
       if (!el) return;
       const obs = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) setActiveId(id);
-        },
-        { rootMargin: "-20% 0px -70% 0px", threshold: 0 }
+        ([entry]) => { if (entry.isIntersecting) setActiveId(id); },
+        { rootMargin: "-20% 0px -65% 0px", threshold: 0 },
       );
       obs.observe(el);
       observers.push(obs);
@@ -391,50 +432,113 @@ function SidebarNav({ sections, accent }: { sections: ProjectSection[]; accent: 
     e.preventDefault();
     const el = document.getElementById(id);
     if (!el) return;
-    const offset = 96; // sticky nav height + padding
+    const offset = 96;
     const top = el.getBoundingClientRect().top + window.scrollY - offset;
     window.scrollTo({ top, behavior: "smooth" });
     setActiveId(id);
   };
 
   return (
-    <div className="hidden lg:flex flex-col w-44 shrink-0">
-      <div className="sticky top-28 flex flex-col gap-1">
-        {labels.map((label) => {
-          const id = labelToId(label);
-          const isActive = activeId === id;
-          return (
-            <a
-              key={label}
-              href={`#${id}`}
-              onClick={(e) => handleClick(e, id)}
-              className="group flex items-center gap-2.5 py-1.5 text-sm transition-all duration-200"
-              style={{
-                color: isActive ? "var(--text-primary)" : "var(--text-muted)",
-                textDecoration: "none",
-              }}
-            >
-              {/* Active indicator bar */}
-              <span
-                className="shrink-0 h-4 rounded-full transition-all duration-200"
+    <div className="hidden lg:block w-52 shrink-0">
+      <div className="sticky top-24 flex flex-col gap-0">
+
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4">
+          <span
+            className="text-[11px] uppercase tracking-[0.12em] font-semibold"
+            style={{ color: "var(--text-muted)" }}
+          >
+            {t("portfolio.sidebar.title")}
+          </span>
+          <span
+            className="text-[11px] font-medium tabular-nums"
+            style={{ color: "var(--text-muted)", opacity: 0.6 }}
+          >
+            {Math.round(readProgress)}%
+          </span>
+        </div>
+
+        {/* Progress track */}
+        <div
+          className="w-full h-px mb-4 rounded-full overflow-hidden"
+          style={{ backgroundColor: "var(--border)" }}
+        >
+          <div
+            className="h-full rounded-full transition-all duration-150"
+            style={{ width: `${readProgress}%`, backgroundColor: accent }}
+          />
+        </div>
+
+        {/* Nav items */}
+        <nav className="flex flex-col gap-0.5">
+          {labels.map((label, idx) => {
+            const id       = labelToId(label);
+            const isActive = activeId === id;
+            return (
+              <a
+                key={label}
+                href={`#${id}`}
+                onClick={(e) => handleClick(e, id)}
+                className="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200"
                 style={{
-                  width: isActive ? "3px" : "2px",
-                  backgroundColor: isActive ? accent : "var(--border-strong)",
-                  opacity: isActive ? 1 : 0.4,
-                }}
-              />
-              <span
-                className="transition-all duration-200 leading-snug"
-                style={{
-                  fontWeight: isActive ? 500 : 400,
-                  opacity: isActive ? 1 : 0.55,
+                  textDecoration:  "none",
+                  backgroundColor: isActive ? `${accent}14` : "transparent",
+                  color:           isActive ? "var(--text-primary)" : "var(--text-muted)",
                 }}
               >
-                {label}
-              </span>
-            </a>
-          );
-        })}
+                {/* Step number dot */}
+                <span
+                  className="flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold shrink-0 transition-all duration-200"
+                  style={{
+                    backgroundColor: isActive ? accent                    : "var(--bg-secondary)",
+                    color:           isActive ? "#0a0a0a"                 : "var(--text-muted)",
+                    border:          isActive ? "none"                    : "1px solid var(--border)",
+                    boxShadow:       isActive ? `0 0 0 3px ${accent}22`  : "none",
+                  }}
+                >
+                  {idx + 1}
+                </span>
+
+                {/* Label */}
+                <span
+                  className="leading-snug transition-all duration-200 flex-1 min-w-0 truncate"
+                  style={{
+                    fontWeight: isActive ? 500 : 400,
+                    opacity:    isActive ? 1   : 0.6,
+                  }}
+                >
+                  {label}
+                </span>
+
+                {/* Active arrow */}
+                {isActive && (
+                  <span
+                    className="text-[10px] font-bold shrink-0"
+                    style={{ color: accent, opacity: 0.8 }}
+                  >
+                    ›
+                  </span>
+                )}
+              </a>
+            );
+          })}
+        </nav>
+
+        {/* Scroll to top */}
+        {readProgress > 20 && (
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="mt-4 flex items-center gap-2 px-3 py-2 rounded-xl text-xs transition-all duration-200 hover:opacity-80 w-full"
+            style={{
+              color:           "var(--text-muted)",
+              backgroundColor: "var(--bg-secondary)",
+              border:          "1px solid var(--border)",
+            }}
+          >
+            <span style={{ opacity: 0.6 }}>↑</span>
+            {t("portfolio.sidebar.backtop")}
+          </button>
+        )}
       </div>
     </div>
   );
@@ -442,18 +546,23 @@ function SidebarNav({ sections, accent }: { sections: ProjectSection[]; accent: 
 
 /* ─── Main component ─── */
 export function PortfolioDetail({ project }: { project: Project }) {
+  const { t } = useLang();
+
   const isNotionOnly =
     project.sections.length === 1 && project.sections[0].type === "notion-only";
 
   const meta = [
-    project.year && { icon: Calendar, label: "Year", value: project.year },
-    project.duration && { icon: Clock, label: "Duration", value: project.duration },
-    project.role && { icon: User, label: "Role", value: project.role },
-    project.client && { icon: Building2, label: "Client", value: project.client },
+    project.year     && { icon: Calendar,  label: t("portfolio.meta.year"),     value: project.year },
+    project.duration && { icon: Clock,     label: t("portfolio.meta.duration"), value: project.duration },
+    project.role     && { icon: User,      label: t("portfolio.meta.role"),     value: project.role },
+    project.client   && { icon: Building2, label: t("portfolio.meta.client"),   value: project.client },
   ].filter(Boolean) as { icon: typeof Calendar; label: string; value: string }[];
 
   return (
     <div style={{ backgroundColor: "var(--bg)", minHeight: "100vh" }}>
+      {/* Reading progress bar */}
+      <ReadingProgress accent={project.accent} />
+
       {/* Sticky nav */}
       <nav
         className="fixed top-0 left-0 right-0 z-50 h-16 flex items-center px-6 md:px-10"
@@ -463,26 +572,29 @@ export function PortfolioDetail({ project }: { project: Project }) {
           borderBottom: "1px solid var(--border)",
         }}
       >
-        <div className="max-w-5xl mx-auto w-full flex items-center justify-between">
+        <div className="max-w-6xl mx-auto w-full flex items-center justify-between">
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-sm font-medium transition-opacity hover:opacity-70"
             style={{ color: "var(--text-secondary)" }}
           >
             <ArrowLeft size={15} />
-            Back to portfolio
+            {t("portfolio.back")}
           </Link>
-          <Link
-            href="/"
-            className="font-display font-extrabold text-base tracking-tight"
-            style={{ color: "var(--text-primary)" }}
-          >
-            ux<span style={{ color: "var(--accent)" }}>naufal</span>
-          </Link>
+          <div className="flex items-center gap-3">
+            <LangToggle />
+            <Link
+              href="/"
+              className="font-display font-extrabold text-base tracking-tight"
+              style={{ color: "var(--text-primary)" }}
+            >
+              ux<span style={{ color: "var(--accent)" }}>naufal</span>
+            </Link>
+          </div>
         </div>
       </nav>
 
-      <main className="pt-24 pb-32 px-6 md:px-10 max-w-5xl mx-auto">
+      <main className="pt-24 pb-32 px-6 md:px-10 max-w-6xl mx-auto">
         {/* ── Header ── */}
         <div className="mb-12">
           {/* Type badge */}
@@ -588,9 +700,9 @@ export function PortfolioDetail({ project }: { project: Project }) {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4, delay: 0.28 }}
           >
-            {project.tags.map((t) => (
+            {project.tags.map((tag) => (
               <span
-                key={t}
+                key={tag}
                 className="text-xs px-3 py-1.5 rounded-full border"
                 style={{
                   borderColor: "var(--accent-border)",
@@ -598,7 +710,7 @@ export function PortfolioDetail({ project }: { project: Project }) {
                   backgroundColor: "var(--accent-bg)",
                 }}
               >
-                {t}
+                {tag}
               </span>
             ))}
           </motion.div>
@@ -625,7 +737,7 @@ export function PortfolioDetail({ project }: { project: Project }) {
         )}
 
         {/* ── Body: sidebar + content ── */}
-        <div className="flex gap-12">
+        <div className="flex gap-14 items-start">
           {!isNotionOnly && <SidebarNav sections={project.sections} accent={project.accent} />}
 
           <div className="flex-1 flex flex-col gap-0">
@@ -657,13 +769,13 @@ export function PortfolioDetail({ project }: { project: Project }) {
                 className="text-xs uppercase tracking-widest font-medium mb-1.5"
                 style={{ color: "var(--accent)" }}
               >
-                Next step
+                {t("portfolio.cta.label")}
               </div>
               <div
                 className="font-display font-bold text-xl"
                 style={{ color: "var(--text-primary)" }}
               >
-                Want to see the full case study?
+                {t("portfolio.cta.heading")}
               </div>
             </div>
             <div className="flex flex-wrap gap-3">
@@ -675,7 +787,7 @@ export function PortfolioDetail({ project }: { project: Project }) {
                   className="inline-flex items-center gap-2 px-5 py-3 rounded-full text-sm font-medium transition-all hover:opacity-85 active:scale-95 border"
                   style={{ borderColor: "var(--border-strong)", color: "var(--text-secondary)" }}
                 >
-                  Live Site
+                  {t("portfolio.cta.live")}
                   <ArrowUpRight size={14} />
                 </a>
               )}
@@ -687,7 +799,7 @@ export function PortfolioDetail({ project }: { project: Project }) {
                   className="inline-flex items-center gap-2 px-5 py-3 rounded-full text-sm font-medium transition-all hover:opacity-85 active:scale-95"
                   style={{ backgroundColor: project.accent, color: "#0a0a0a" }}
                 >
-                  View on Notion
+                  {t("portfolio.cta.notion")}
                   <ArrowUpRight size={14} />
                 </a>
               )}
@@ -697,7 +809,7 @@ export function PortfolioDetail({ project }: { project: Project }) {
                 style={{ borderColor: "var(--border-strong)", color: "var(--text-secondary)" }}
               >
                 <ArrowLeft size={14} />
-                All projects
+                {t("portfolio.cta.all")}
               </Link>
             </div>
           </motion.div>

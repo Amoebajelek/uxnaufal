@@ -13,6 +13,7 @@ export interface AnalyticsSummary {
   week:       number;
   dailyViews: DailyView[];
   topPages:   TopPage[];
+  updatedAt:  string; // ISO timestamp of when the summary was generated
 }
 
 /** Returns "YYYY-MM-DD" for a UTC date offset by `daysAgo`. */
@@ -27,7 +28,12 @@ function utcDayStart(daysAgo = 0): string {
   return `${utcDate(daysAgo)}T00:00:00.000Z`;
 }
 
-export async function getAnalyticsSummary(): Promise<AnalyticsSummary> {
+/**
+ * @param days  Number of days for the chart window (7, 14, or 30). Defaults to 14.
+ */
+export async function getAnalyticsSummary(days = 14): Promise<AnalyticsSummary> {
+  const chartDays = Math.min(90, Math.max(7, days));
+
   const [totalRes, todayRes, weekRes, topRes, dailyRes] = await Promise.all([
     supabase.from("page_views").select("*", { count: "exact", head: true }),
 
@@ -37,11 +43,13 @@ export async function getAnalyticsSummary(): Promise<AnalyticsSummary> {
     supabase.from("page_views").select("*", { count: "exact", head: true })
       .gte("created_at", utcDayStart(7)),
 
+    // Top pages — always last 7 days
     supabase.from("page_views").select("path")
       .gte("created_at", utcDayStart(7)),
 
+    // Daily chart data — last `chartDays` days
     supabase.from("page_views").select("created_at")
-      .gte("created_at", utcDayStart(13)),
+      .gte("created_at", utcDayStart(chartDays - 1)),
   ]);
 
   // Top pages (last 7 days)
@@ -54,7 +62,7 @@ export async function getAnalyticsSummary(): Promise<AnalyticsSummary> {
     .slice(0, 8)
     .map(([path, count]) => ({ path, count }));
 
-  // Daily views for chart — last 14 days (UTC dates)
+  // Daily views for chart — fill every date slot so the chart has no gaps
   const dayMap: Record<string, number> = {};
   for (const r of dailyRes.data ?? []) {
     const day = (r.created_at as string).split("T")[0];
@@ -62,7 +70,7 @@ export async function getAnalyticsSummary(): Promise<AnalyticsSummary> {
   }
 
   const dailyViews: DailyView[] = [];
-  for (let i = 13; i >= 0; i--) {
+  for (let i = chartDays - 1; i >= 0; i--) {
     const date = utcDate(i);
     dailyViews.push({ date, count: dayMap[date] ?? 0 });
   }
@@ -73,5 +81,6 @@ export async function getAnalyticsSummary(): Promise<AnalyticsSummary> {
     week:       weekRes.count  ?? 0,
     dailyViews,
     topPages,
+    updatedAt:  new Date().toISOString(),
   };
 }

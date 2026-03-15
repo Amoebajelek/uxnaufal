@@ -5,47 +5,76 @@ import { LanguageProvider } from "@/components/LanguageContext";
 import { PageTracker } from "@/components/PageTracker";
 import "./globals.css";
 
-const BASE_URL = "https://uxnaufal.vercel.app";
+const BASE_URL  = "https://uxnaufal.vercel.app";
+const AUTHOR    = "Naufal Abdussyakur";
+const SITE_NAME = "uxnaufal";
+const HANDLE    = "@uxnaufal";
+
+// Default OG image — used when no page-level image is set
+const DEFAULT_OG = `${BASE_URL}/Thumbnail_Aitiserve.jpg`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
+
   title: {
-    default: "Naufal Abdussyakur — UI/UX Designer",
-    template: "%s — uxnaufal",
+    default:  `${AUTHOR} — UI/UX Designer`,
+    template: `%s — ${SITE_NAME}`,
   },
+
   description:
     "UI/UX Designer with 3+ years crafting digital products that are useful and enjoyable. Based in Bandung, Indonesia.",
+
   keywords: [
     "UI/UX Designer", "UX Design", "Product Design", "Interaction Design",
-    "Figma", "User Research", "Bandung", "Indonesia", "Naufal Abdussyakur",
+    "User Research", "Figma", "Design System", "Wireframe", "Prototyping",
+    "Bandung", "Indonesia", AUTHOR, SITE_NAME,
   ],
-  authors: [{ name: "Naufal Abdussyakur", url: BASE_URL }],
-  creator: "Naufal Abdussyakur",
-  robots: { index: true, follow: true },
-  alternates: { canonical: BASE_URL },
-  openGraph: {
-    title: "Naufal Abdussyakur — UI/UX Designer",
-    description:
-      "UI/UX Designer with 3+ years crafting digital products that are useful and enjoyable. Based in Bandung, Indonesia.",
-    url: BASE_URL,
-    siteName: "uxnaufal",
-    locale: "en_US",
-    type: "website",
+
+  authors:   [{ name: AUTHOR, url: BASE_URL }],
+  creator:   AUTHOR,
+  publisher: AUTHOR,
+  category:  "Design Portfolio",
+
+  robots: {
+    index:               true,
+    follow:              true,
+    googleBot: {
+      index:             true,
+      follow:            true,
+      "max-image-preview": "large",
+      "max-snippet":     -1,
+    },
   },
+
+  alternates: { canonical: BASE_URL },
+
+  openGraph: {
+    title:       `${AUTHOR} — UI/UX Designer`,
+    description: "UI/UX Designer with 3+ years crafting digital products that are useful and enjoyable. Based in Bandung, Indonesia.",
+    url:         BASE_URL,
+    siteName:    SITE_NAME,
+    locale:      "en_US",
+    type:        "website",
+    images: [{
+      url:    DEFAULT_OG,
+      width:  1200,
+      height: 630,
+      alt:    `${AUTHOR} — UI/UX Designer Portfolio`,
+      type:   "image/jpeg",
+    }],
+  },
+
   twitter: {
-    card: "summary_large_image",
-    title: "Naufal Abdussyakur — UI/UX Designer",
-    description:
-      "UI/UX Designer with 3+ years crafting digital products that are useful and enjoyable.",
-    creator: "@uxnaufal",
+    card:        "summary_large_image",
+    title:       `${AUTHOR} — UI/UX Designer`,
+    description: "UI/UX Designer with 3+ years crafting digital products that are useful and enjoyable.",
+    creator:     HANDLE,
+    site:        HANDLE,
+    images:      [DEFAULT_OG],
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
