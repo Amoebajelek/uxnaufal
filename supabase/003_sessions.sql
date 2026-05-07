@@ -20,6 +20,10 @@ create index if not exists admin_sessions_active_idx
 -- RLS: only service_role can read/write
 alter table admin_sessions enable row level security;
 
+drop policy if exists "service_role only" on admin_sessions;
+
 create policy "service_role only"
   on admin_sessions
-  using (auth.role() = 'service_role');
+  for all
+  using (auth.role() = 'service_role')
+  with check (auth.role() = 'service_role');
