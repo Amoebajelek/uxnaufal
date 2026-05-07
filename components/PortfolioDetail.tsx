@@ -26,7 +26,7 @@ function fadeUp(delay = 0) {
 }
 
 /* ─── Section label (e.g. "Problem #1", "Solution #2") ─── */
-function SectionLabel({ label, accent }: { label?: string; accent: string }) {
+function SectionLabel({ label, accent: _accent }: { label?: string; accent: string }) {
   if (!label) return null;
   return (
     <p className="text-base font-medium mb-1.5" style={{ color: "var(--text-muted)" }}>
@@ -130,10 +130,10 @@ function ContextSection({ section, accent }: { section: ProjectSection; accent: 
 }
 
 /* ─── Problem Discovery ─── */
-function ProblemDiscoverySection({ section, accent }: { section: ProjectSection; accent: string }) {
+function ProblemDiscoverySection({ section, accent: _accent }: { section: ProjectSection; accent: string }) {
   return (
     <motion.div {...fadeUp(0)}>
-      <SectionLabel label={section.label} accent={accent} />
+      <SectionLabel label={section.label} accent={_accent} />
       <SectionHeading text={section.heading} />
       {section.content && <BodyText text={section.content} />}
     </motion.div>
@@ -141,7 +141,7 @@ function ProblemDiscoverySection({ section, accent }: { section: ProjectSection;
 }
 
 /* ─── Problem (numbered, with optional image) ─── */
-function ProblemSection({ section, accent }: { section: ProjectSection; accent: string }) {
+function ProblemSection({ section, accent: _accent }: { section: ProjectSection; accent: string }) {
   const { t } = useLang();
   return (
     <motion.div {...fadeUp(0)}>

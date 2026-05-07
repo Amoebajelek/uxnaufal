@@ -20,7 +20,6 @@ export function Hero() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const y1 = useTransform(scrollYProgress, [0, 1], [0, -80]);
   const y2 = useTransform(scrollYProgress, [0, 1], [0, -140]);
-  const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
 
   const stats = [
     { label: t("hero.stat1.label"), value: t("hero.stat1.value"), accent: true },

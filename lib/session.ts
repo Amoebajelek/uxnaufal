@@ -21,11 +21,14 @@ export const SESSION_DURATION = {
 };
 
 function getSecret(): string {
-  return (
-    process.env.SESSION_SECRET ??
-    process.env.SUPABASE_SERVICE_ROLE_KEY ??
-    "dev-only-fallback-change-in-production"
-  );
+  const secret = process.env.SESSION_SECRET ?? process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (secret) return secret;
+
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("SESSION_SECRET or SUPABASE_SERVICE_ROLE_KEY must be configured.");
+  }
+
+  return "dev-only-fallback-change-in-production";
 }
 
 async function importKey(): Promise<CryptoKey> {
@@ -43,6 +46,19 @@ function toBase64url(buf: ArrayBuffer): string {
   let str = "";
   for (let i = 0; i < bytes.length; i++) str += String.fromCharCode(bytes[i]);
   return btoa(str).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+}
+
+function fromBase64url(input: string): Uint8Array | null {
+  try {
+    const base64 = input.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, "=");
+    const binary = atob(padded);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return bytes;
+  } catch {
+    return null;
+  }
 }
 
 async function hmacSign(data: string): Promise<string> {
@@ -93,8 +109,19 @@ export async function verifySessionToken(
     return { valid: false, sessionId: "" };
   }
 
-  const expectedSig = await hmacSign(payload);
-  if (expectedSig !== sig) return { valid: false, sessionId: "" };
+  const key = await importKey();
+  const signature = fromBase64url(sig);
+  if (!signature) return { valid: false, sessionId: "" };
+  const signatureBuffer = new ArrayBuffer(signature.byteLength);
+  new Uint8Array(signatureBuffer).set(signature);
+
+  const verified = await crypto.subtle.verify(
+    "HMAC",
+    key,
+    signatureBuffer,
+    new TextEncoder().encode(payload),
+  );
+  if (!verified) return { valid: false, sessionId: "" };
 
   return { valid: true, sessionId };
 }

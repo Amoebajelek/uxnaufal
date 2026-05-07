@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { readAdminConfig } from "@/lib/admin-config.server";
-import { supabase } from "@/lib/supabase.server";
+import { readAdminConfig, verifyAdminPassword, writeAdminConfig } from "@/lib/admin-config.server";
+import { getSupabase } from "@/lib/supabase.server";
 import { SESSION_COOKIE, SESSION_DURATION, createSessionToken } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
@@ -19,34 +19,42 @@ export async function POST(request: Request) {
     const { username, password, rememberMe } = await request.json();
     const config = await readAdminConfig();
 
-    if (username !== config.username || password !== config.password) {
+    if (
+      typeof username !== "string" ||
+      typeof password !== "string" ||
+      username !== config.username ||
+      !verifyAdminPassword(config, password)
+    ) {
       return NextResponse.json({ error: "Username atau password salah" }, { status: 401 });
+    }
+
+    if (config.legacyPassword) {
+      writeAdminConfig({ username: config.username, password }).catch((e) => {
+        console.warn("[auth] legacy password hash upgrade failed:", e);
+      });
     }
 
     const maxAge = rememberMe ? SESSION_DURATION.long : SESSION_DURATION.short;
     const expiresAt = new Date(Date.now() + maxAge * 1000);
 
-    // Create session record in DB (best-effort — login still works if this fails)
-    let sessionId: string;
-    try {
-      const { data: session, error } = await supabase
-        .from("admin_sessions")
-        .insert({
-          expires_at: expiresAt.toISOString(),
-          ip: getClientIp(request),
-          user_agent: request.headers.get("user-agent") ?? "unknown",
-          is_active: true,
-        })
-        .select("id")
-        .single();
+    const supabase = getSupabase();
+    const { data: session, error } = await supabase
+      .from("admin_sessions")
+      .insert({
+        expires_at: expiresAt.toISOString(),
+        ip: getClientIp(request),
+        user_agent: request.headers.get("user-agent") ?? "unknown",
+        is_active: true,
+      })
+      .select("id")
+      .single();
 
-      if (error || !session) throw error ?? new Error("no session returned");
-      sessionId = session.id;
-    } catch (dbErr) {
-      console.warn("[auth] session DB insert failed (continuing without it):", dbErr);
-      // Fallback: random UUID — token still validates via HMAC, sessions list just won't show it
-      sessionId = crypto.randomUUID();
+    if (error || !session) {
+      console.error("[auth] session DB insert failed:", error);
+      return NextResponse.json({ error: "Gagal membuat sesi login." }, { status: 500 });
     }
+
+    const sessionId = session.id;
 
     // Build signed cookie token
     const token = await createSessionToken(sessionId, expiresAt.getTime());
@@ -72,6 +80,7 @@ export async function DELETE(request: Request) {
   const sessionId = request.headers.get("x-session-id");
 
   if (sessionId) {
+    const supabase = getSupabase();
     const { error: deactivateErr } = await supabase
       .from("admin_sessions")
       .update({ is_active: false })

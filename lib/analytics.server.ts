@@ -2,7 +2,7 @@
  * Server-only: analytics queries from Supabase page_views table.
  * All date arithmetic uses UTC to match Supabase timestamp storage.
  */
-import { supabase } from "./supabase.server";
+import { getSupabase } from "./supabase.server";
 
 export interface DailyView { date: string; count: number }
 export interface TopPage   { path: string; count: number }
@@ -33,6 +33,7 @@ function utcDayStart(daysAgo = 0): string {
  */
 export async function getAnalyticsSummary(days = 14): Promise<AnalyticsSummary> {
   const chartDays = Math.min(90, Math.max(7, days));
+  const supabase = getSupabase();
 
   const [totalRes, todayRes, weekRes, topRes, dailyRes] = await Promise.all([
     supabase.from("page_views").select("*", { count: "exact", head: true }),

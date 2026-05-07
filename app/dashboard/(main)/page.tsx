@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   LayoutDashboard, FolderOpen, Eye, TrendingUp, CalendarDays,
   Plus, Pencil, Trash2, ExternalLink, ArrowUpRight, RefreshCw,
-  Download, Clock, ChevronDown,
+  Download, Clock,
 } from "lucide-react";
 import type { Project } from "@/lib/projects";
 import type { AnalyticsSummary, DailyView, TopPage } from "@/lib/analytics.server";

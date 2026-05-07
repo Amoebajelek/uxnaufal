@@ -7,13 +7,15 @@
 CREATE TABLE IF NOT EXISTS admin_config (
   id       INTEGER PRIMARY KEY DEFAULT 1,
   username TEXT    NOT NULL DEFAULT 'admin',
-  password TEXT    NOT NULL DEFAULT 'admin',
+  password TEXT,
+  password_hash TEXT,
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Seed default admin row (admin / admin)
-INSERT INTO admin_config (id, username, password)
-VALUES (1, 'admin', 'admin')
+-- Seed the config row only. Set the initial password with ADMIN_PASSWORD
+-- or through the dashboard after the app is running.
+INSERT INTO admin_config (id, username)
+VALUES (1, 'admin')
 ON CONFLICT (id) DO NOTHING;
 
 -- ── 2. Portfolio projects ──────────────────────────────────────

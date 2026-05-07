@@ -331,7 +331,7 @@ export default function SettingsPage() {
     !saving && !success &&
     currentPassword.length > 0 &&
     newUsername.trim().length >= 3 &&
-    newPassword.length >= 4 &&
+    newPassword.length >= 8 &&
     newPassword === confirmPassword;
 
   async function handleSubmit(e: React.FormEvent) {
@@ -340,7 +340,7 @@ export default function SettingsPage() {
     setSuccess(false);
 
     if (newUsername.trim().length < 3)   { setError(t("dash.settings.err.username")); return; }
-    if (newPassword.length < 4)          { setError(t("dash.settings.err.pwlen"));    return; }
+    if (newPassword.length < 8)          { setError(t("dash.settings.err.pwlen"));    return; }
     if (newPassword !== confirmPassword) { setError(t("dash.settings.err.pwmatch"));  return; }
 
     setSaving(true);
@@ -465,7 +465,7 @@ export default function SettingsPage() {
             <PasswordInput
               value={newPassword}
               onChange={setNewPassword}
-              placeholder="minimal 4 karakter"
+              placeholder="minimal 8 karakter"
               autoComplete="new-password"
             />
             {newPassword.length > 0 && (

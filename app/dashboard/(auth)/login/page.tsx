@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Lock, User, Eye, EyeOff, ShieldCheck, ArrowRight, Loader2 } from "lucide-react";
 import { useLang } from "@/components/LanguageContext";
 import { LangToggle } from "@/components/LangToggle";
+import { safeDashboardPath } from "@/lib/redirect";
 
 // ─── Ambient background ───────────────────────────────────────────────────────
 function Background() {
@@ -42,7 +43,7 @@ function Background() {
 function LoginForm() {
   const router       = useRouter();
   const searchParams = useSearchParams();
-  const nextPath     = searchParams.get("next") ?? "/dashboard";
+  const nextPath     = safeDashboardPath(searchParams.get("next"));
   const { t }        = useLang();
 
   const [username,   setUsername]   = useState("");

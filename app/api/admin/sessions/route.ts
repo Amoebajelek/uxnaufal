@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase.server";
+import { getSupabase } from "@/lib/supabase.server";
 
 export const dynamic = "force-dynamic";
 
 // ── GET /api/admin/sessions — list active sessions ──────────────────────────
 export async function GET(request: Request) {
   const currentSessionId = request.headers.get("x-session-id") ?? "";
+  const supabase = getSupabase();
 
   const { data, error } = await supabase
     .from("admin_sessions")
@@ -29,6 +30,7 @@ export async function GET(request: Request) {
 // ?all=1       → revoke all sessions except current
 export async function DELETE(request: Request) {
   const currentSessionId = request.headers.get("x-session-id") ?? "";
+  const supabase = getSupabase();
   const { searchParams } = new URL(request.url);
   const id  = searchParams.get("id");
   const all = searchParams.get("all") === "1";

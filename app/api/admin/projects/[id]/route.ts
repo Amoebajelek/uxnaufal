@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import {
   readOneProject,
+  readAllProjects,
   upsertProject,
   deleteProject,
   seedIfEmpty,
 } from "@/lib/data-store.server";
-import type { Project } from "@/lib/projects";
+import { validateProjectPayload } from "@/lib/project-validation.server";
 
 export const dynamic = "force-dynamic";
 
@@ -23,16 +24,16 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   const { id } = await params;
   try {
     await seedIfEmpty();
-    const body = (await request.json()) as Project;
-
     const existing = await readOneProject(id);
     if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-    const updated: Project = {
-      ...body,
-      id,
-      slug: body.slug || id,
-    };
+    const updated = validateProjectPayload(await request.json(), id);
+    updated.id = id;
+
+    const all = await readAllProjects();
+    if (all.some((p) => p.id !== id && p.slug === updated.slug)) {
+      return NextResponse.json({ error: "Slug proyek sudah digunakan." }, { status: 409 });
+    }
 
     await upsertProject(updated);
     return NextResponse.json(updated);

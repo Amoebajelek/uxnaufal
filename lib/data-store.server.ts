@@ -3,13 +3,17 @@
  * Falls back to in-memory defaults from lib/projects.ts when DB is unavailable.
  */
 
-import { supabase } from "./supabase.server";
+import { getSupabase } from "./supabase.server";
 import type { Project } from "./projects";
 import { projects as DEFAULT_PROJECTS } from "./projects";
 
 /** Deep clone helper. */
 function deepClone<T>(obj: T): T {
   return JSON.parse(JSON.stringify(obj)) as T;
+}
+
+function canUseDefaultFallback(): boolean {
+  return process.env.NODE_ENV !== "production" || process.env.ALLOW_PROJECT_FALLBACK === "1";
 }
 
 /** Map a Supabase row → Project object. */
@@ -63,6 +67,7 @@ function projectToRow(p: Project, sortOrder?: number) {
 
 export async function readAllProjects(): Promise<Project[]> {
   try {
+    const supabase = getSupabase();
     const { data, error } = await supabase
       .from("portfolio")
       .select("*")
@@ -70,18 +75,19 @@ export async function readAllProjects(): Promise<Project[]> {
 
     if (error) throw error;
     if (!data || data.length === 0) {
-      // DB is empty — return defaults (first run)
-      return deepClone(DEFAULT_PROJECTS);
+      return canUseDefaultFallback() ? deepClone(DEFAULT_PROJECTS) : [];
     }
     return data.map(rowToProject);
   } catch (e) {
     console.error("[data-store] readAllProjects error:", e);
-    return deepClone(DEFAULT_PROJECTS);
+    if (canUseDefaultFallback()) return deepClone(DEFAULT_PROJECTS);
+    throw e;
   }
 }
 
 export async function readOneProject(id: string): Promise<Project | undefined> {
   try {
+    const supabase = getSupabase();
     const { data, error } = await supabase
       .from("portfolio")
       .select("*")
@@ -100,6 +106,7 @@ export async function readOneProject(id: string): Promise<Project | undefined> {
 // ── Write ────────────────────────────────────────────────────────
 
 export async function upsertProject(project: Project): Promise<void> {
+  const supabase = getSupabase();
   // Preserve existing sort_order if record already exists
   const { data: existing } = await supabase
     .from("portfolio")
@@ -117,6 +124,7 @@ export async function upsertProject(project: Project): Promise<void> {
 }
 
 export async function deleteProject(id: string): Promise<boolean> {
+  const supabase = getSupabase();
   const { error, count } = await supabase
     .from("portfolio")
     .delete({ count: "exact" })
@@ -132,6 +140,7 @@ export async function deleteProject(id: string): Promise<boolean> {
  */
 export async function seedIfEmpty(): Promise<void> {
   try {
+    const supabase = getSupabase();
     const { count } = await supabase
       .from("portfolio")
       .select("*", { count: "exact", head: true });

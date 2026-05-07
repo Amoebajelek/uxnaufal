@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { readAdminConfig, writeAdminConfig } from "@/lib/admin-config.server";
+import { readAdminConfig, verifyAdminPassword, writeAdminConfig } from "@/lib/admin-config.server";
 
 export const dynamic = "force-dynamic";
 
@@ -15,13 +15,13 @@ export async function PUT(request: Request) {
     const { currentPassword, newUsername, newPassword } = await request.json();
 
     const config = await readAdminConfig();
-    if (currentPassword !== config.password) {
+    if (typeof currentPassword !== "string" || !verifyAdminPassword(config, currentPassword)) {
       return NextResponse.json({ error: "Password saat ini salah." }, { status: 401 });
     }
 
-    if (!newPassword || newPassword.length < 4) {
+    if (typeof newPassword !== "string" || newPassword.length < 8) {
       return NextResponse.json(
-        { error: "Password baru minimal 4 karakter." },
+        { error: "Password baru minimal 8 karakter." },
         { status: 400 }
       );
     }
